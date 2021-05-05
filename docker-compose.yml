@@ -1,0 +1,49 @@
+version: '3.4'
+
+services:
+  klipper:
+    image: dimalo/klipper-moonraker:latest
+    build:
+      dockerfile: ./klipper/Dockerfile
+      context: .
+      # args:
+      #   DEVICE_GROUP: device
+      #   DEVICE_GID: 987
+    container_name: klipper
+    privileged: true
+    ports:
+      - 7125:7125
+    restart: unless-stopped
+    volumes:
+      - ./gcode_files:/home/klippy/gcode_files
+      - ./config:/home/klippy/.config
+    #  mount serial device - take care to grant sufficient permissions to the device: <host_dev>:<container_dev>
+#    devices:
+#      - /dev/klipper:/dev/klipper
+
+  fluidd:
+    image: cadriel/fluidd:latest
+    container_name: fluidd
+    ports:
+      - 8010:80
+    restart: unless-stopped
+    depends_on: 
+      - klipper
+    links:
+      - klipper:klipper
+
+  mainsail:
+    image: dimalo/mainsail:latest
+    build:
+      dockerfile: Dockerfile
+      context: frontend
+      args:
+        FRONTEND_ZIP_URL: https://github.com/meteyou/mainsail/releases/latest/download/mainsail.zip
+    container_name: mainsail
+    restart: unless-stopped
+    ports:
+      - 8011:80
+    depends_on: 
+      - klipper
+    links:
+      - klipper:klipper
