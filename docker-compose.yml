@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   klipper:
-    image: dimalo/klipper-moonraker:latest
+    image: gucio1200/klipper:aarch64
     build:
       dockerfile: ./klipper/Dockerfile
       context: .
@@ -14,12 +14,40 @@ services:
     ports:
       - 7125:7125
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "--silent", "--fail", "http://localhost:7125/server/info"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - ./gcode_files:/home/klippy/gcode_files
       - ./config:/home/klippy/.config
-    #  mount serial device - take care to grant sufficient permissions to the device: <host_dev>:<container_dev>
-#    devices:
-#      - /dev/klipper:/dev/klipper
+    devices:
+      - /dev/ttyACM0:/dev/ttyACM0
+
+  klipperscreen:
+    image: gucio1200/klipperscreen:aarch64
+    build:
+      dockerfile: ./klipperscreen/Dockerfile
+      context: .
+    environment:
+     - DISPLAY=unix:0.0
+    container_name: klipperscreen
+    restart: unless-stopped
+    depends_on:
+      klipper:
+        condition: service_healthy
+    links:
+      - klipper:klipper
+    healthcheck:
+      test: ["CMD", "curl", "--silent", "--fail", "http://klipper:7125/printer/info"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./klipperscreen/KlipperScreen:/root/KlipperScreen
+      - ./config/KlipperScreen.conf:/root/KlipperScreen.conf
 
   fluidd:
     image: cadriel/fluidd:latest
@@ -27,8 +55,9 @@ services:
     ports:
       - 8010:80
     restart: unless-stopped
-    depends_on: 
-      - klipper
+    depends_on:
+      klipper:
+        condition: service_healthy
     links:
       - klipper:klipper
 
@@ -43,7 +72,21 @@ services:
     restart: unless-stopped
     ports:
       - 8011:80
-    depends_on: 
-      - klipper
+    depends_on:
+      klipper:
+        condition: service_healthy
     links:
       - klipper:klipper
+
+  ustreamer:
+    image: gucio1200/ustreamer:aarch64
+    build:
+      dockerfile: ./ustreamer/Dockerfile
+      context: .
+    container_name: ustreamer
+    restart: unless-stopped
+    command: ./ustreamer --host=0.0.0.0 --slowdown
+    ports:
+      - 8080:8080
+    devices:
+      - /dev/video0:/dev/video0

@@ -1,0 +1,16 @@
+version: '3.4'
+
+services:
+  klipperscreen:
+    image: gucio1200/klipperscreen:aarch64
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    environment:
+     - DISPLAY=unix:0.0
+    container_name: klipperscreen
+    restart: unless-stopped
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /root/docker/klipperscreen/KlipperScreen:/root/KlipperScreen
+      - ./KlipperScreen.conf:/root/KlipperScreen.conf

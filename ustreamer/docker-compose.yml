@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  ustreamer:
+    image: gucio1200/ustreamer:aarch64
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    container_name: ustreamer
+    restart: unless-stopped
+    command: ./ustreamer --host=0.0.0.0 --slowdown
+    ports:
+      - 8080:8080
+    devices:
+      - /dev/video0:/dev/video0
