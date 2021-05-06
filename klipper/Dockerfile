@@ -1,17 +1,16 @@
-FROM python:3.9-buster as builder
+FROM python:3.9 as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 ARG USER=klippy
 ARG HOME=/home/${USER}
 ARG KLIPPER_VENV_DIR=${HOME}/klippy-env
-ARG KLIPPER_DIR=${HOME}/klipper
 ARG MOONRAKER_VENV_DIR=${HOME}/moonraker-env
 
 RUN useradd -d ${HOME} -ms /bin/bash ${USER}
 RUN apt-get update && \
     apt-get install -y locales git sudo wget gzip tar python-virtualenv virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
-    build-essential libncurses-dev libusb-dev avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi libusb-1.0
+    apt-utils libffi-dev build-essential libncurses-dev libusb-dev avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi libusb-1.0
 RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
 RUN locale-gen
 
@@ -28,10 +27,15 @@ RUN [ ! -d ${KLIPPER_VENV_DIR} ] && virtualenv ${KLIPPER_VENV_DIR}
 RUN ${KLIPPER_VENV_DIR}/bin/python -m pip install pip -U
 RUN ${KLIPPER_VENV_DIR}/bin/pip install wheel
 RUN ${KLIPPER_VENV_DIR}/bin/pip install -r klipper/scripts/klippy-requirements.txt
+RUN ${KLIPPER_VENV_DIR}/bin/pip install numpy matplotlib
 
-WORKDIR ${KLIPPER_DIR}
-COPY klipper/.config-linux .config
-RUN make
+WORKDIR ${HOME}/klipper
+
+COPY klipper/.config-linux ${HOME}/klipper/.config
+RUN make && mv out out_linux
+
+COPY klipper/.config-s6 ${HOME}/klipper/.config
+RUN make && mv out out_s6
 
 WORKDIR ${HOME}
 
@@ -42,7 +46,7 @@ RUN ${MOONRAKER_VENV_DIR}/bin/python -m pip install pip -U
 RUN ${MOONRAKER_VENV_DIR}/bin/pip install wheel gpiod
 RUN ${MOONRAKER_VENV_DIR}/bin/pip install -r moonraker/scripts/moonraker-requirements.txt
 
-FROM python:3.9-slim-buster as image
+FROM python:3.9-slim as image
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -56,8 +60,11 @@ RUN apt-get update && \
     libjpeg62-turbo \
     libtiff5 \
     gpiod \
+    libopenjp2-7 \
     rsync \
-    libopenjp2-7 && \
+    zlib1g-dev \
+    curl \
+    python3-libgpiod && \
     sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen && \
     # Clean up
