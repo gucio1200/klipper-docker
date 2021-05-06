@@ -22,8 +22,9 @@ services:
     volumes:
       - ./gcode_files:/home/klippy/gcode_files
       - ./config:/home/klippy/.config
+      - /dev:/dev
     devices:
-      - /dev/ttyACM0:/dev/ttyACM0
+      - /dev/klipper:/dev/klipper
 
   klipperscreen:
     image: gucio1200/klipperscreen:aarch64
