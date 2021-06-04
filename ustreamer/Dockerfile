@@ -22,8 +22,8 @@ RUN apt-get update && \
         libjpeg8 \
         uuid \
         libbsd0 \
-	gpiod \
-	libgpiod-dev
+        gpiod \
+        libgpiod-dev
 
 WORKDIR /ustreamer
 COPY --from=build /build/ustreamer/ustreamer .
