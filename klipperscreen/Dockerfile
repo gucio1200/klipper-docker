@@ -25,9 +25,9 @@ RUN git clone https://github.com/jordanruthe/KlipperScreen
 RUN [ ! -d ${KLIPPER_VENV_DIR} ] && virtualenv -p /usr/bin/python3 ${KLIPPER_VENV_DIR}
 RUN ${KLIPPER_VENV_DIR}/bin/python -m pip install pip -U
 RUN ${KLIPPER_VENV_DIR}/bin/pip install setuptools wheel pep517 p5py PyGObject
-RUN ${KLIPPER_VENV_DIR}/bin/pip install humanize==3.4.1 jinja2==2.11.3 requests==2.25.1 websocket-client==0.58.0 requests==2.25.1 websocket-client==0.58.0 vext==0.7.6
+RUN ${KLIPPER_VENV_DIR}/bin/pip install $(cat KlipperScreen/scripts/KlipperScreen-requirements.txt | sed -e /matplotlib/d )
+RUN ${KLIPPER_VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy $(cat KlipperScreen/scripts/KlipperScreen-requirements.txt | grep matplotlib)
 RUN . ${KLIPPER_VENV_DIR}/bin/activate && pip install vext.gi==0.7.4
-RUN ${KLIPPER_VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy matplotlib==3.4.1
 RUN ${KLIPPER_VENV_DIR}/bin/vext -e
 
 
