@@ -21,6 +21,10 @@ services:
       retries: 5
     volumes:
       - ./gcode_files:/home/klippy/gcode_files
+      - ./klipper-src:/home/klippy/klipper
+      - ./.moonraker_database://home/klippy/.moonraker_database
+      - ./moonraker-src:/home/klippy/moonraker
+      - ./klipperscreen/KlipperScreen:/home/klippy/klipperscreen
       - ./config:/home/klippy/.config
       - /dev:/dev
     devices:
