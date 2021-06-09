@@ -39,13 +39,6 @@ RUN make && mv out out_s6
 
 WORKDIR ${HOME}
 
-# Install moonraker
-RUN git clone https://github.com/Arksine/moonraker.git
-RUN [ ! -d ${MOONRAKER_VENV_DIR} ] && python3 -m venv ${MOONRAKER_VENV_DIR}
-RUN ${MOONRAKER_VENV_DIR}/bin/python -m pip install pip -U
-RUN ${MOONRAKER_VENV_DIR}/bin/pip install wheel gpiod
-RUN ${MOONRAKER_VENV_DIR}/bin/pip install -r moonraker/scripts/moonraker-requirements.txt
-
 FROM python:3.9-slim as image
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -106,17 +99,11 @@ RUN mkdir -p ${HOME}/gcode_files && \
 VOLUME ${HOME}/gcode_files
 VOLUME ${CONFIG_DIR}
 
-EXPOSE 7125
-
-USER root
+USER ${USER}
 
 COPY --chown=${USER}:${USER} --from=builder ${HOME}/klipper ${HOME}/klipper
 COPY --chown=${USER}:${USER} --from=builder ${KLIPPER_VENV_DIR} ${KLIPPER_VENV_DIR}
-COPY --chown=${USER}:${USER} --from=builder ${HOME}/moonraker ${HOME}/moonraker
-COPY --chown=${USER}:${USER} --from=builder ${MOONRAKER_VENV_DIR} ${MOONRAKER_VENV_DIR}
-
 COPY --chown=${USER}:${USER} config ${CONFIG_DIR}
+COPY --chown=${USER}:${USER} klipper/start-klipper.sh /start-klipper.sh
 
-COPY klipper/supervisord.conf /etc/supervisord/conf.d/supervisord.conf
-COPY klipper/*.ini /etc/supervisord/
-CMD ["supervisord", "-c", "/etc/supervisord/conf.d/supervisord.conf"]
+CMD ["/start-klipper.sh"]
