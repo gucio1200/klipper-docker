@@ -36,10 +36,10 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           builder: ${{ steps.buildx.outputs.name }}
-          context: .
+          context: frontend
           file: ./frontend/Dockerfile
           platforms: linux/arm64
           push: true
           tags: gucio1200/mainsail:latest
-          cache-from: type=registry,ref=gucio1200/mainsail:latest
-          cache-to: type=inline
+          build-args: |
+            FRONTEND_ZIP_URL=https://github.com/meteyou/mainsail/releases/latest/download/mainsail.zip
