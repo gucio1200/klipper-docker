@@ -93,6 +93,4 @@ COPY --chown=${USER}:${USER} --from=builder ${MOONRAKER_VENV_DIR} ${MOONRAKER_VE
 COPY --chown=${USER}:${USER} config ${CONFIG_DIR}
 COPY --chown=${USER}:${USER} moonraker/start-moonraker.sh /start-moonraker.sh
 
-USER ${USER}
-
 ENTRYPOINT ["/start-moonraker.sh"]
