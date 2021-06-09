@@ -95,4 +95,4 @@ COPY --chown=${USER}:${USER} moonraker/start-moonraker.sh /start-moonraker.sh
 
 USER ${USER}
 
-ENTRYPOINT ["./start-moonraker.sh"]
+ENTRYPOINT ["/start-moonraker.sh"]
