@@ -1,7 +1,7 @@
 
 ---
 
-name: Build docker
+name: Build klipperscreen
 on:
   push:
     tags-ignore:

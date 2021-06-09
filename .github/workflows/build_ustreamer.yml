@@ -1,7 +1,7 @@
 
 ---
 
-name: Build docker
+name: Build Ustreamer
 on:
   push:
     tags-ignore:

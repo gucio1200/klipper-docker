@@ -1,7 +1,7 @@
 
 ---
 
-name: Build docker
+name: Build Mainsail
 on:
   push:
     tags-ignore:
