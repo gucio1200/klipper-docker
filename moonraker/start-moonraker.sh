@@ -1,4 +1,3 @@
-
 #!/bin/bash
 wait_file() {
   local file="$1"; shift
