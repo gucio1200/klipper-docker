@@ -11,7 +11,7 @@ RUN unzip /tmp/frontend.zip -d /frontend
 
 FROM nginx:alpine as image
 
-ENV KLIPPER_HOST klipper
+ENV KLIPPER_HOST moonreaker
 ENV KLIPPER_API_PORT 7125
 ENV JPEG_STREAM_HOST localhost
 ENV JPEG_STREAM_PORT 8888
