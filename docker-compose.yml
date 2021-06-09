@@ -2,36 +2,66 @@ version: '3.4'
 
 services:
   klipper:
-    image: gucio1200/klipper:aarch64
-    build:
-      dockerfile: ./klipper/Dockerfile
-      context: .
-      # args:
-      #   DEVICE_GROUP: device
-      #   DEVICE_GID: 987
+    image: gucio1200/klipper:latest
     container_name: klipper
+    privileged: true
+    depends_on:
+      - mcu
+    restart: unless-stopped
+    volumes:
+      - ./runtime/src/klipper:/home/klippy/klipper
+      - ./runtime/src/moonraker:/home/klippy/moonraker
+      - ./runtime/src/KlipperScreen:/home/klippy/klipperscreen
+      - ./runtime/.moonraker_database:/home/klippy/.moonraker_database
+      - ./runtime/config:/home/klippy/.config
+      - ./runtime/logs:/logs
+      - ./runtime/gcode_files:/home/klippy/gcode_files
+      - ./runtime/tmp:/tmp
+      - /dev:/dev
+    devices:
+      - /dev/klipper:/dev/klipper
+
+  mcu:
+    image: gucio1200/klipper:latest
+    container_name: mcu
+    privileged: true
+    restart: unless-stopped
+    user: "0:0"
+    command: /home/klippy/klipper/out_linux/klipper.elf -w
+    volumes:
+      - ./runtime/config:/home/klippy/.config
+      - ./runtime/logs:/logs
+      - ./runtime/gcode_files:/home/klippy/gcode_files
+      - ./runtime/tmp:/tmp
+      - /dev:/dev
+
+  moonraker:
+    image: gucio1200/moonraker:latest
+    container_name: moonraker
     privileged: true
     ports:
       - 7125:7125
     restart: unless-stopped
+    depends_on:
+      - klipper
     healthcheck:
       test: ["CMD", "curl", "--silent", "--fail", "http://localhost:7125/server/info"]
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
-      - ./gcode_files:/home/klippy/gcode_files
-      - ./klipper-src:/home/klippy/klipper
-      - ./.moonraker_database://home/klippy/.moonraker_database
-      - ./moonraker-src:/home/klippy/moonraker
-      - ./klipperscreen/KlipperScreen:/home/klippy/klipperscreen
-      - ./config:/home/klippy/.config
+      - ./runtime/src/klipper:/home/klippy/klipper
+      - ./runtime/src/moonraker:/home/klippy/moonraker
+      - ./runtime/src/KlipperScreen:/home/klippy/klipperscreen
+      - ./runtime/.moonraker_database:/home/klippy/.moonraker_database
+      - ./runtime/config:/home/klippy/.config
+      - ./runtime/logs:/logs
+      - ./runtime/gcode_files:/home/klippy/gcode_files
+      - ./runtime/tmp:/tmp
       - /dev:/dev
-    devices:
-      - /dev/klipper:/dev/klipper
 
   klipperscreen:
-    image: gucio1200/klipperscreen:aarch64
+    image: gucio1200/klipperscreen:latest
     build:
       dockerfile: ./klipperscreen/Dockerfile
       context: .
@@ -40,19 +70,19 @@ services:
     container_name: klipperscreen
     restart: unless-stopped
     depends_on:
-      klipper:
+      moonraker:
         condition: service_healthy
     links:
-      - klipper:klipper
+      - moonraker:moonraker
     healthcheck:
-      test: ["CMD", "curl", "--silent", "--fail", "http://klipper:7125/printer/info"]
+      test: ["CMD", "curl", "--silent", "--fail", "http://moonraker:7125/printer/info"]
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - ./klipperscreen/KlipperScreen:/root/KlipperScreen
-      - ./config/KlipperScreen.conf:/root/KlipperScreen.conf
+      - ./runtime/src/KlipperScreen:/root/KlipperScreen
+      - ./runtime/config/KlipperScreen.conf:/root/KlipperScreen.conf
 
   fluidd:
     image: cadriel/fluidd:latest
@@ -61,13 +91,13 @@ services:
       - 8010:80
     restart: unless-stopped
     depends_on:
-      klipper:
+      moonraker:
         condition: service_healthy
     links:
-      - klipper:klipper
+      - moonraker:moonraker
 
   mainsail:
-    image: dimalo/mainsail:latest
+    image: gucio1200/mainsail:latest
     build:
       dockerfile: Dockerfile
       context: frontend
@@ -78,13 +108,13 @@ services:
     ports:
       - 8011:80
     depends_on:
-      klipper:
+      moonraker:
         condition: service_healthy
     links:
-      - klipper:klipper
+      - moonraker:moonraker
 
   ustreamer:
-    image: gucio1200/ustreamer:aarch64
+    image: gucio1200/ustreamer:latest
     build:
       dockerfile: ./ustreamer/Dockerfile
       context: .

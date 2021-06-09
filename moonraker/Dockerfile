@@ -4,13 +4,12 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 ARG USER=klippy
 ARG HOME=/home/${USER}
-ARG KLIPPER_VENV_DIR=${HOME}/klippy-env
 ARG MOONRAKER_VENV_DIR=${HOME}/moonraker-env
 
 RUN useradd -d ${HOME} -ms /bin/bash ${USER}
 RUN apt-get update && \
     apt-get install -y locales git sudo wget gzip tar python-virtualenv virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
-    libffi-dev build-essential libncurses-dev libusb-dev avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi libusb-1.0
+    libffi-dev build-essential libncurses-dev libusb-dev
 RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
 RUN locale-gen
 
@@ -21,23 +20,12 @@ ENV LANGUAGE en_GB:en
 USER ${USER}
 WORKDIR ${HOME}
 
-### Klipper setup ###
-RUN git clone https://github.com/KevinOConnor/klipper.git
-RUN [ ! -d ${KLIPPER_VENV_DIR} ] && virtualenv ${KLIPPER_VENV_DIR}
-RUN ${KLIPPER_VENV_DIR}/bin/python -m pip install pip -U
-RUN ${KLIPPER_VENV_DIR}/bin/pip install wheel
-RUN ${KLIPPER_VENV_DIR}/bin/pip install -r klipper/scripts/klippy-requirements.txt
-RUN ${KLIPPER_VENV_DIR}/bin/pip install numpy matplotlib
-
-WORKDIR ${HOME}/klipper
-
-COPY klipper/.config-linux ${HOME}/klipper/.config
-RUN make && mv out out_linux
-
-COPY klipper/.config-s6 ${HOME}/klipper/.config
-RUN make && mv out out_s6
-
-WORKDIR ${HOME}
+# Install moonraker
+RUN git clone https://github.com/Arksine/moonraker.git
+RUN [ ! -d ${MOONRAKER_VENV_DIR} ] && python3 -m venv ${MOONRAKER_VENV_DIR}
+RUN ${MOONRAKER_VENV_DIR}/bin/python -m pip install pip -U
+RUN ${MOONRAKER_VENV_DIR}/bin/pip install wheel gpiod
+RUN ${MOONRAKER_VENV_DIR}/bin/pip install -r moonraker/scripts/moonraker-requirements.txt
 
 FROM python:3.9-slim as image
 
@@ -49,7 +37,6 @@ RUN apt-get update && \
     git \
     gcc \
     locales \
-    supervisor \
     libjpeg62-turbo \
     libtiff5 \
     gpiod \
@@ -73,7 +60,6 @@ ENV LANGUAGE en_GB:en
 ARG USER=klippy
 ARG HOME=/home/${USER}
 ENV CONFIG_DIR=${HOME}/.config
-ENV KLIPPER_VENV_DIR=${HOME}/klippy-env
 ENV MOONRAKER_VENV_DIR=${HOME}/moonraker-env
 
 ARG DEVICE_GROUP=device
@@ -84,9 +70,8 @@ RUN useradd --user-group --no-log-init --shell /bin/false -m -d ${HOME} ${USER} 
     usermod -a -G ${DEVICE_GROUP} ${USER} && \
     usermod -a -G tty ${USER} && \
     usermod -a -G dialout ${USER} && \
-    mkdir -p /var/log/supervisor && \
     mkdir -p /var/log/klipper && chown ${USER}:${USER} /var/log/klipper && \
-    pip install --no-cache supervisord-dependent-startup gpiod
+    pip install --no-cache gpiod
 
 RUN mkdir -p /usr/lib/python3 && ln -s /usr/local/lib/python3.9/site-packages /usr/lib/python3/dist-packages
 
@@ -99,11 +84,15 @@ RUN mkdir -p ${HOME}/gcode_files && \
 VOLUME ${HOME}/gcode_files
 VOLUME ${CONFIG_DIR}
 
+EXPOSE 7125
+
+USER root
+
+COPY --chown=${USER}:${USER} --from=builder ${HOME}/moonraker ${HOME}/moonraker
+COPY --chown=${USER}:${USER} --from=builder ${MOONRAKER_VENV_DIR} ${MOONRAKER_VENV_DIR}
+COPY --chown=${USER}:${USER} config ${CONFIG_DIR}
+COPY --chown=${USER}:${USER} moonraker/start-moonraker.sh /start-moonraker.sh
+
 USER ${USER}
 
-COPY --chown=${USER}:${USER} --from=builder ${HOME}/klipper ${HOME}/klipper
-COPY --chown=${USER}:${USER} --from=builder ${KLIPPER_VENV_DIR} ${KLIPPER_VENV_DIR}
-COPY --chown=${USER}:${USER} config ${CONFIG_DIR}
-COPY --chown=${USER}:${USER} klipper/start-klipper.sh /start-klipper.sh
-
-CMD ["/start-klipper.sh"]
+ENTRYPOINT ["/start-moonraker.sh"]
