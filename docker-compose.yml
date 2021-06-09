@@ -82,7 +82,7 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ./runtime/src/KlipperScreen:/root/KlipperScreen
-      - ./config/KlipperScreen.conf:/root/KlipperScreen.conf
+      - ./runtime/config/KlipperScreen.conf:/root/KlipperScreen.conf
 
   fluidd:
     image: cadriel/fluidd:latest
