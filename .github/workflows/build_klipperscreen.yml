@@ -8,6 +8,9 @@ on:
       - '**'
     branches:
       - '**'
+  schedule:
+    - cron: "42 13 * * 0,2,5"
+
       
 jobs:
   docker:
