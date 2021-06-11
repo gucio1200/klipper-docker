@@ -23,10 +23,11 @@ jobs:
           
     runs-on: ubuntu-latest
     steps:
+        
       - uses: mego22/actions-git-sha@main
         id: remote_sha
         with:
           repo: "${{ matrix.repos }}"
           
       - name: Print sha
-        run: echo "The sha is ${{ steps.remote_sha.outputs.sha }} for repo ${{ steps.remote_sha.outputs.name }}"
+        run: echo "The sha is ${{ steps.remote_sha.outputs.sha }} for repo ${{ steps.remote_sha.input.repo }}"
