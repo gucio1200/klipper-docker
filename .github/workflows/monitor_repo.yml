@@ -1,0 +1,19 @@
+---
+
+name: Check remote
+on:
+  push:
+    tags-ignore:
+      - '**'
+    branches:
+      - '**'
+  schedule:
+    - cron: "42 13 * * 0,2,5"
+      
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: mego22/actions-git-sha@main
+        with:
+          repo: "https://github.com/KevinOConnor/klipper.git"
