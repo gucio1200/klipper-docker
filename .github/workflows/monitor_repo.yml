@@ -29,4 +29,4 @@ jobs:
           repo: "${{ matrix.repos }}"
           
       - name: Print sha
-        run: echo "The sha is ${{ steps.remote_sha.outputs.sha }}"
+        run: echo "The sha is ${{ steps.remote_sha.outputs.sha }} for repo ${{ steps.remote_sha.outputs.name }}"
