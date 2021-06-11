@@ -15,5 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: mego22/actions-git-sha@main
+        id: remote_sha
         with:
           repo: "https://github.com/KevinOConnor/klipper.git"
+          
+      - name: Print sha
+        run: echo "The sha is ${{ steps.remote_sha.outputs.sha }}"
