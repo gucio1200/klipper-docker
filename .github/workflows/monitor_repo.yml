@@ -29,6 +29,6 @@ jobs:
           repository:  ${{ matrix.repos }}
           fetch-depth: 0
           
-      - run: echo ${{ matrix }}
+      - run: echo ${{ matrix.repos }}
         shell: bash
           
