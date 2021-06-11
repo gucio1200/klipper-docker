@@ -15,11 +15,11 @@ jobs:
     strategy:
       matrix:
         repos:
-          - https://github.com/KevinOConnor/klipper.git
-          - https://github.com/jordanruthe/KlipperScreen.git
-          - https://github.com/meteyou/mainsail.git
-          - https://github.com/Arksine/moonraker.git
-          - https://github.com/pikvm/ustreamer.git
+          - KevinOConnor/klipper
+          - jordanruthe/KlipperScreen
+          - meteyou/mainsail
+          - Arksine/moonraker
+          - pikvm/ustreamer
           
     runs-on: ubuntu-latest
     steps:
