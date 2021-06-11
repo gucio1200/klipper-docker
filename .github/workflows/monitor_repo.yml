@@ -29,6 +29,12 @@ jobs:
           repository:  ${{ matrix.repos }}
           fetch-depth: 0
           
-      - run: echo ${{ matrix.repos }}
+      - name: check if Updated
+        run: |
+         if [ $(git log --format=format:%s --first-parent --since='24 hours ago' | wc -l) -gt 0 ]; 
+         then 
+           echo "UPGRADE=true" >> $GITHUB_ENV
+         fi
         shell: bash
+
           
