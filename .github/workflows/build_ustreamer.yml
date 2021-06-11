@@ -43,3 +43,17 @@ jobs:
           platforms: linux/arm64
           push: true
           tags: gucio1200/ustreamer:latest
+          cache-from: type=registry,ref=gucio1200/ustreamer:latest
+          cache-to: type=inline
+        if: github.event_name == 'push'
+        
+      - name: Build
+        uses: docker/build-push-action@v2
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: .
+          file: ./ustreamer/Dockerfile
+          platforms: linux/arm64
+          push: true
+          tags: gucio1200/ustreamer:latest
+        if: github.event_name != 'push'
