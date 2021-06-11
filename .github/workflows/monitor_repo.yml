@@ -4,7 +4,7 @@ name: Check remote
 on:
   schedule:
     - cron: "59 11 * * *"
-  repository_dispatch:
+  workflow_dispatch:
       
 jobs:
   check:
