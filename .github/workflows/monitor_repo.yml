@@ -31,6 +31,11 @@ jobs:
           
       - name: Check if Updated
         run: |
+         git log --format=format:%s --first-parent --since='24 hours ago'
+        shell: bash
+          
+      - name: Check if Updated
+        run: |
          if [ $(git log --format=format:%s --first-parent --since='24 hours ago' | wc -l) -gt 0 ]; 
          then 
            echo "UPGRADE=true" >> $GITHUB_ENV
