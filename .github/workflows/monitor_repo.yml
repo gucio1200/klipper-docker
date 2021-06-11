@@ -31,22 +31,11 @@ jobs:
           
       - name: Check if Updated
         run: |
-         git log --format=format:%s --first-parent --since='24 hours ago'
-        shell: bash
-          
-      - name: Check if Updated
-        run: |
-         if [ $(git log --format=format:%s --first-parent --since='24 hours ago' | wc -l) -gt 0 ]; 
+         if [ $(git log --shortstat --since=yesterday | grep 'files changed' | wc -l) -gt 0 ]; 
          then 
            echo "UPGRADE=true" >> $GITHUB_ENV
          fi
         shell: bash
-        
-      - name: Need to update
-        run: |
-         echo ${{ matrix.repos }}
-        shell: bash
-        if: env.UPGRADE
         
       - name: Set dispatch event
         run: |
