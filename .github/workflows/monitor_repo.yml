@@ -48,7 +48,7 @@ jobs:
         uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          event-type: env.DISPATCH_EVENT
+          event-type: ${{ env.DISPATCH_EVENT }}
         if: env.UPGRADE
 
           
