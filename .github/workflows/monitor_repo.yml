@@ -50,7 +50,7 @@ jobs:
         run: |
          echo ${{ matrix.repos }}
         shell: bash
-        if: env.UPGRADE == true
+        if: env.UPGRADE
         
       
 
