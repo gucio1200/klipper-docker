@@ -42,13 +42,15 @@ jobs:
          fi
         shell: bash
         
-      - name: Check if Updated
-        run: env
-        shell: bash
-        
       - name: Need to update
         run: |
          echo ${{ matrix.repos }}
+        shell: bash
+        if: env.UPGRADE
+        
+      - name: Set dispatch event
+        run: |
+         echo "DISPATCH_EVENT=$(echo ${{ matrix.repos }} | sed 's/^[^\/]*\///g'" >> $GITHUB_ENV
         shell: bash
         if: env.UPGRADE
         
@@ -56,6 +58,6 @@ jobs:
         uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          event-type: my-event
+          event-type: env.DISPATCH_EVENT
 
           
