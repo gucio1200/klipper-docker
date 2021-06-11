@@ -51,8 +51,7 @@ jobs:
       - name: Set dispatch event
         run: |
          event=$(echo ${{ matrix.repos }} | sed 's/^[^\/]*\///g')
-         echo $event
-#         echo "DISPATCH_EVENT=$(echo ${{ matrix.repos }} | sed 's/^[^\/]*\///g'" >> $GITHUB_ENV
+         echo "DISPATCH_EVENT=$event" >> $GITHUB_ENV
         shell: bash
         if: env.UPGRADE
         
@@ -61,5 +60,6 @@ jobs:
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           event-type: env.DISPATCH_EVENT
+        if: env.UPGRADE
 
           
