@@ -43,3 +43,17 @@ jobs:
           platforms: linux/arm64
           push: true
           tags: gucio1200/klipper:latest
+          cache-from: type=registry,ref=gucio1200/klipper:latest
+          cache-to: type=inline
+        if: github.event_name == 'push'
+        
+      - name: Build
+        uses: docker/build-push-action@v2
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: .
+          file: ./klipper/Dockerfile
+          platforms: linux/arm64
+          push: true
+          tags: gucio1200/klipper:latest
+        if: github.event_name != 'push'
