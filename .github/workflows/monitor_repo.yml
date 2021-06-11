@@ -42,6 +42,10 @@ jobs:
          fi
         shell: bash
         
+      - name: Check if Updated
+        run: env
+        shell: bash
+        
       - name: Need to update
         run: |
          echo ${{ matrix.repos }}
