@@ -3,7 +3,7 @@
 name: Check remote
 on:
   schedule:
-    - cron: "59 11 * * *"
+    - cron: "59 */12 * * *"
   workflow_dispatch:
       
 jobs:
