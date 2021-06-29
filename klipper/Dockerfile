@@ -84,7 +84,7 @@ RUN useradd --user-group --no-log-init --shell /bin/false -m -d ${HOME} ${USER} 
     usermod -a -G ${DEVICE_GROUP} ${USER} && \
     usermod -a -G tty ${USER} && \
     usermod -a -G dialout ${USER} && \
-    mkdir -p /var/log/klipper && chown ${USER}:${USER} /var/log/klipper && \
+    mkdir -p /var/log/klipper && chown ${USER}:${USER} /var/log/klipper ${HOME} && \
     pip install --no-cache gpiod
 
 RUN mkdir -p /usr/lib/python3 && ln -s /usr/local/lib/python3.9/site-packages /usr/lib/python3/dist-packages
@@ -94,7 +94,7 @@ WORKDIR ${HOME}
 
 RUN mkdir -p ${HOME}/gcode_files && \
     mkdir -p ${CONFIG_DIR} && \
-    touch ${HOME}/.moonraker_api_key
+    mkdir -p ${HOME}/.moonraker_database
 VOLUME ${HOME}/gcode_files
 VOLUME ${CONFIG_DIR}
 
