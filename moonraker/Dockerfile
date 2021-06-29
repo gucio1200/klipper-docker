@@ -9,7 +9,7 @@ ARG MOONRAKER_VENV_DIR=${HOME}/moonraker-env
 RUN useradd -d ${HOME} -ms /bin/bash ${USER}
 RUN apt-get update && \
     apt-get install -y locales git sudo wget gzip tar python-virtualenv virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
-    libffi-dev build-essential libncurses-dev libusb-dev
+    libffi-dev build-essential libncurses-dev libusb-dev liblmdb0 libsodium-dev
 RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
 RUN locale-gen
 
@@ -45,6 +45,7 @@ RUN apt-get update && \
     zlib1g-dev \
     curl \
     libsodium-dev \
+    liblmdb0 \
     python3-libgpiod && \
     sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen && \
@@ -70,7 +71,7 @@ RUN useradd --user-group --no-log-init --shell /bin/false -m -d ${HOME} ${USER} 
     usermod -a -G ${DEVICE_GROUP} ${USER} && \
     usermod -a -G tty ${USER} && \
     usermod -a -G dialout ${USER} && \
-    mkdir -p /var/log/klipper && chown ${USER}:${USER} /var/log/klipper && \
+    mkdir -p /var/log/klipper && chown ${USER}:${USER} /var/log/klipper ${HOME} && \
     pip install --no-cache gpiod
 
 RUN mkdir -p /usr/lib/python3 && ln -s /usr/local/lib/python3.9/site-packages /usr/lib/python3/dist-packages
@@ -80,7 +81,7 @@ WORKDIR ${HOME}
 
 RUN mkdir -p ${HOME}/gcode_files && \
     mkdir -p ${CONFIG_DIR} && \
-    touch ${HOME}/.moonraker_api_key
+    mkdir -p ${HOME}/.moonraker_database
 VOLUME ${HOME}/gcode_files
 VOLUME ${CONFIG_DIR}
 
