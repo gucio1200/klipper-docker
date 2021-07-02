@@ -59,6 +59,7 @@ RUN apt-get update && \
     liblmdb0 \
     python3-libgpiod \
     python \
+    libfreetype6 \
     bash && \
     sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen && \
