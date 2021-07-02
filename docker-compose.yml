@@ -3,6 +3,7 @@ version: '3.4'
 services:
   klipper:
     image: gucio1200/klipper:latest
+#    image: 482421a55a2e
     container_name: klipper
     privileged: true
     depends_on:
@@ -23,6 +24,7 @@ services:
 
   mcu:
     image: gucio1200/klipper:latest
+#    image: 482421a55a2e
     container_name: mcu
     privileged: true
     restart: unless-stopped
@@ -37,6 +39,7 @@ services:
 
   moonraker:
     image: gucio1200/moonraker:latest
+#    image: 1fabb9b3149b
     container_name: moonraker
     privileged: true
     ports:
@@ -52,6 +55,7 @@ services:
     volumes:
       - ./runtime/src/klipper:/home/klippy/klipper
       - ./runtime/src/moonraker:/home/klippy/moonraker
+      - ./runtime/src/fluidd:/home/klippy/fluidd
       - ./runtime/src/KlipperScreen:/home/klippy/klipperscreen
       - ./runtime/.moonraker_database:/home/klippy/.moonraker_database
       - ./runtime/config:/home/klippy/.config
@@ -125,3 +129,15 @@ services:
       - 8080:8080
     devices:
       - /dev/video0:/dev/video0
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    ports:
+      - "9000:9000"
+      - "8000:8000"
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./runtime/portainer:/data
