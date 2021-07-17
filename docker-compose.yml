@@ -124,7 +124,7 @@ services:
       context: .
     container_name: ustreamer
     restart: unless-stopped
-    command: ./ustreamer --host=0.0.0.0 --slowdown
+    command: ./ustreamer --host=0.0.0.0 --slowdown --format=uyvy --drop-same-frames=30
     ports:
       - 8080:8080
     devices:
@@ -141,3 +141,16 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./runtime/portainer:/data
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "8012:80"
+    volumes:
+      - ./runtime/logs:/usr/share/nginx/html/logs
+      - ./runtime/gcode_files:/usr/share/nginx/html/gcode_files
+      - ./runtime/tmp:/usr/share/nginx/html/tmp
+      - ./runtime/empty:/usr/share/nginx/html
+      - ./runtime/default.conf:/etc/nginx/conf.d/default.conf
