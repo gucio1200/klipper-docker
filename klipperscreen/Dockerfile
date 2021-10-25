@@ -36,6 +36,7 @@ FROM arm64v8/python:slim as image
 ARG DEBIAN_FRONTEND=noninteractive
 
 ARG HOME=/root
+ARG USER=klippy
 ARG KLIPPER_VENV_DIR=/root/klipperscreen-env
 
 RUN apt-get update && \
