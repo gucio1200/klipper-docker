@@ -1,7 +1,7 @@
 
 ---
 
-name: Build klipperscreen
+name: Build KlipperScreen
 on:
   push:
     tags-ignore:
