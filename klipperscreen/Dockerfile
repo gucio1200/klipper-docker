@@ -2,9 +2,12 @@ FROM arm64v8/python:slim as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-ARG HOME=/root
-ARG KLIPPER_VENV_DIR=/root/klipperscreen-env
+ARG USER=klippy
+ARG HOME=/home/${USER}
+ARG KLIPPER_VENV_DIR=${HOME}/klipperscreen-env
 
+
+RUN useradd -d ${HOME} -ms /bin/bash ${USER}
 RUN apt-get update && \
     apt-get install -y locales git sudo wget gzip tar python3-distutils python3-gi \
     python3-gi-cairo python3-virtualenv gir1.2-gtk-3.0 virtualenv matchbox-keyboard python3-dev \
@@ -18,6 +21,7 @@ ENV LC_ALL en_GB.UTF-8
 ENV LANG en_GB.UTF-8
 ENV LANGUAGE en_GB:en
 
+USER ${USER}
 WORKDIR ${HOME}
 
 ### KlipperScreen setup ###
@@ -30,14 +34,15 @@ RUN ${KLIPPER_VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary 
 RUN . ${KLIPPER_VENV_DIR}/bin/activate && pip install vext.gi==0.7.4
 RUN ${KLIPPER_VENV_DIR}/bin/vext -e
 
+WORKDIR ${HOME}
 
 FROM arm64v8/python:slim as image
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-ARG HOME=/root
 ARG USER=klippy
-ARG KLIPPER_VENV_DIR=/root/klipperscreen-env
+ARG HOME=/home/${USER}
+ARG KLIPPER_VENV_DIR=${HOME}/klipperscreen-env
 
 RUN apt-get update && \
     apt-get install -y locales git sudo libatlas-base-dev python3-distutils python3-gi \
@@ -56,4 +61,4 @@ COPY --chown=${USER}:${USER} --from=builder ${KLIPPER_VENV_DIR} ${KLIPPER_VENV_D
 
 WORKDIR ${HOME}/KlipperScreen
 
-CMD ["/root/klipperscreen-env/bin/python","screen.py"]
+CMD ["/home/klippy/klipperscreen-env/bin/python","screen.py"]
