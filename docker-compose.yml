@@ -3,17 +3,13 @@ version: '3.4'
 services:
   klipper:
     image: gucio1200/klipper:latest
-#    image: 482421a55a2e
     container_name: klipper
     privileged: true
     depends_on:
       - mcu
     restart: unless-stopped
     volumes:
-      - ./runtime/src/klipper:/home/klippy/klipper
-      - ./runtime/src/moonraker:/home/klippy/moonraker
-      - ./runtime/src/KlipperScreen:/home/klippy/klipperscreen
-      - ./runtime/.moonraker_database:/home/klippy/.moonraker_database
+      - klipper:/home/klippy/klipper
       - ./runtime/config:/home/klippy/.config
       - ./runtime/logs:/logs
       - ./runtime/gcode_files:/home/klippy/gcode_files
@@ -24,7 +20,6 @@ services:
 
   mcu:
     image: gucio1200/klipper:latest
-#    image: 482421a55a2e
     container_name: mcu
     privileged: true
     restart: unless-stopped
@@ -39,7 +34,6 @@ services:
 
   moonraker:
     image: gucio1200/moonraker:latest
-#    image: 1fabb9b3149b
     container_name: moonraker
     privileged: true
     ports:
@@ -53,10 +47,9 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ./runtime/src/klipper:/home/klippy/klipper
-      - ./runtime/src/moonraker:/home/klippy/moonraker
-      - ./runtime/src/fluidd:/home/klippy/fluidd
-      - ./runtime/src/KlipperScreen:/home/klippy/klipperscreen
+      - klipper:/home/klippy/klipper
+      - moonraker:/home/klippy/moonraker
+      - KlipperScreen:/home/klippy/klipperscreen
       - ./runtime/.moonraker_database:/home/klippy/.moonraker_database
       - ./runtime/config:/home/klippy/.config
       - ./runtime/logs:/logs
@@ -85,7 +78,7 @@ services:
       retries: 5
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - ./runtime/src/KlipperScreen:/root/KlipperScreen
+      - KlipperScreen:/root/KlipperScreen
       - ./runtime/config/KlipperScreen.conf:/root/KlipperScreen.conf
 
   fluidd:
@@ -99,23 +92,26 @@ services:
         condition: service_healthy
     links:
       - moonraker:moonraker
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fluidd.rule=PathPrefix(`/`)"
 
-  mainsail:
-    image: gucio1200/mainsail:latest
-    build:
-      dockerfile: Dockerfile
-      context: frontend
-      args:
-        FRONTEND_ZIP_URL: https://github.com/meteyou/mainsail/releases/latest/download/mainsail.zip
-    container_name: mainsail
-    restart: unless-stopped
-    ports:
-      - 8011:80
-    depends_on:
-      moonraker:
-        condition: service_healthy
-    links:
-      - moonraker:moonraker
+#  mainsail:
+#    image: gucio1200/mainsail:latest
+#    build:
+#      dockerfile: Dockerfile
+#      context: frontend
+#      args:
+#        FRONTEND_ZIP_URL: https://github.com/meteyou/mainsail/releases/latest/download/mainsail.zip
+#    container_name: mainsail
+#    restart: unless-stopped
+#    ports:
+#      - 8011:80
+#    depends_on:
+#      moonraker:
+#        condition: service_healthy
+#    links:
+#      - moonraker:moonraker
 
   ustreamer:
     image: gucio1200/ustreamer:latest
@@ -124,7 +120,7 @@ services:
       context: .
     container_name: ustreamer
     restart: unless-stopped
-    command: ./ustreamer --host=0.0.0.0 --slowdown --format=uyvy --drop-same-frames=30
+    command: ./ustreamer --host=0.0.0.0 --slowdown --format=mjpeg -r 1280x960 --buffers=3 --drop-same-frames=30 -q 100
     ports:
       - 8080:8080
     devices:
@@ -154,3 +150,29 @@ services:
       - ./runtime/tmp:/usr/share/nginx/html/tmp
       - ./runtime/empty:/usr/share/nginx/html
       - ./runtime/default.conf:/etc/nginx/conf.d/default.conf
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nginx.rule=PathPrefix(`/logs`)"
+      - "traefik.http.routers.nginx.middlewares=stripprefix-nginx@docker"
+      - "traefik.http.middlewares.stripprefix-nginx.stripprefix.prefixes=/logs"
+
+  traefik:
+    image: "traefik"
+    container_name: "traefik"
+    restart: unless-stopped
+    command:
+#      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8088:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+volumes:
+  klipper:
+  KlipperScreen:
+  moonraker:
