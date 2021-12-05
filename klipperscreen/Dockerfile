@@ -29,10 +29,7 @@ RUN git clone https://github.com/jordanruthe/KlipperScreen
 RUN [ ! -d ${KLIPPER_VENV_DIR} ] && virtualenv -p /usr/bin/python3 ${KLIPPER_VENV_DIR}
 RUN ${KLIPPER_VENV_DIR}/bin/python -m pip install pip -U
 RUN ${KLIPPER_VENV_DIR}/bin/pip install setuptools wheel pep517 p5py PyGObject
-RUN ${KLIPPER_VENV_DIR}/bin/pip install $(cat KlipperScreen/scripts/KlipperScreen-requirements.txt | sed -E -e /matplotlib\|vext/d )
-RUN ${KLIPPER_VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy $(cat KlipperScreen/scripts/KlipperScreen-requirements.txt | grep matplotlib)
-RUN . ${KLIPPER_VENV_DIR}/bin/activate && pip install vext.gi==0.7.4
-RUN ${KLIPPER_VENV_DIR}/bin/vext -e
+RUN ${KLIPPER_VENV_DIR}/bin/pip install KlipperScreen/scripts/KlipperScreen-requirements.txt
 
 WORKDIR ${HOME}
 
