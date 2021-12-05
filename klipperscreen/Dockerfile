@@ -58,6 +58,6 @@ ENV LANGUAGE en_GB:en
 COPY --chown=${USER}:${USER} --from=builder ${HOME}/klipperscreen ${HOME}/klipperscreen
 COPY --chown=${USER}:${USER} --from=builder ${KLIPPER_VENV_DIR} ${KLIPPER_VENV_DIR}
 
-WORKDIR ${HOME}/KlipperScreen
+WORKDIR ${HOME}/klipperscreen
 
 CMD ["/home/klippy/klipperscreen-env/bin/python","screen.py"]
