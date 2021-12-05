@@ -44,6 +44,8 @@ ARG USER=klippy
 ARG HOME=/home/${USER}
 ARG KLIPPER_VENV_DIR=${HOME}/klipperscreen-env
 
+RUN useradd --user-group --no-log-init --shell /bin/false -m -d ${HOME} ${USER}
+
 RUN apt-get update && \
     apt-get install -y locales git sudo libatlas-base-dev python3-distutils python3-gi \
     python3-gi-cairo python3-virtualenv gir1.2-gtk-3.0 virtualenv matchbox-keyboard \
