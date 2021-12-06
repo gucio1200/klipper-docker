@@ -46,6 +46,7 @@ RUN apt-get update && \
     curl \
     libsodium-dev \
     liblmdb0 \
+    iproute2 \
     python3-libgpiod && \
     sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen && \
