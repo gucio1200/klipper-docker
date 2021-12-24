@@ -4,9 +4,6 @@ services:
   klipper:
     image: gucio1200/klipper:latest
     container_name: klipper
-#    privileged: true
-#    depends_on:
-#      - mcu
     restart: unless-stopped
     volumes:
       - klipper:/home/klippy/klipper
@@ -79,7 +76,7 @@ services:
       retries: 5
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - klipperscreen:/home/klippy/KlipperScreen
+      - klipperscreen:/home/klippy/klipperscreen
       - ./runtime/config/KlipperScreen.conf:/home/klippy/KlipperScreen.conf
 
   fluidd:
@@ -96,23 +93,6 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.fluidd.rule=PathPrefix(`/`)"
-
-#  mainsail:
-#    image: gucio1200/mainsail:latest
-#    build:
-#      dockerfile: Dockerfile
-#      context: frontend
-#      args:
-#        FRONTEND_ZIP_URL: https://github.com/meteyou/mainsail/releases/latest/download/mainsail.zip
-#    container_name: mainsail
-#    restart: unless-stopped
-#    ports:
-#      - 8011:80
-#    depends_on:
-#      moonraker:
-#        condition: service_healthy
-#    links:
-#      - moonraker:moonraker
 
   ustreamer:
     image: gucio1200/ustreamer:latest
