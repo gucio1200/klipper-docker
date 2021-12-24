@@ -1,7 +1,7 @@
 
 ---
 
-name: Build klipperscreen
+name: Build KlipperScreen
 on:
   push:
     tags-ignore:
@@ -10,6 +10,7 @@ on:
       - 'master'
   repository_dispatch:
     types: [KlipperScreen]
+  workflow_dispatch:
 
       
 jobs:

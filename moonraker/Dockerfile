@@ -8,7 +8,7 @@ ARG MOONRAKER_VENV_DIR=${HOME}/moonraker-env
 
 RUN useradd -d ${HOME} -ms /bin/bash ${USER}
 RUN apt-get update && \
-    apt-get install -y locales git sudo wget gzip tar python-virtualenv virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
+    apt-get install -y locales git sudo wget gzip tar virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
     libffi-dev build-essential libncurses-dev libusb-dev liblmdb0 libsodium-dev
 RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
 RUN locale-gen
@@ -46,6 +46,7 @@ RUN apt-get update && \
     curl \
     libsodium-dev \
     liblmdb0 \
+    iproute2 \
     python3-libgpiod && \
     sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen && \
@@ -95,5 +96,7 @@ COPY --chown=${USER}:${USER} config ${CONFIG_DIR}
 COPY --chown=${USER}:${USER} moonraker/start-moonraker.sh /start-moonraker.sh
 
 USER ${USER}
+
+RUN mkdir -p ${HOME}/klippy-env/bin && ln -s ${HOME}/moonraker-env/bin/python ${HOME}/klippy-env/bin/python
 
 ENTRYPOINT ["/start-moonraker.sh"]
