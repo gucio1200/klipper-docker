@@ -42,6 +42,7 @@ jobs:
           name: fluidd
           path: |
             dist
+          retention-days: 5
 
 #  docker:
 #    runs-on: ubuntu-latest
