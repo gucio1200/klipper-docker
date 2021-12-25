@@ -39,8 +39,8 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           builder: ${{ steps.buildx.outputs.name }}
-          context: frontend
-          file: ./frontend/Dockerfile
+          context: mainsail
+          file: ./mainsail/Dockerfile
           platforms: linux/arm64
           push: true
           tags: gucio1200/mainsail:latest
