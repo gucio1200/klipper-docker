@@ -19,8 +19,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        repository: fluidd-core/fluidd
-        ref: develop
+        with:
+          repository: fluidd-core/fluidd
+          ref: develop
  
       - name: Install node
         uses: actions/setup-node@v2
