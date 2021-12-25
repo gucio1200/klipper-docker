@@ -37,6 +37,7 @@ services:
     restart: unless-stopped
     depends_on:
       - klipper
+#      - mcu
     healthcheck:
       test: ["CMD", "curl", "--silent", "--fail", "http://localhost:7125/server/info"]
       interval: 10s
