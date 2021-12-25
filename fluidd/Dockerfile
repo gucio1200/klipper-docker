@@ -1,14 +1,14 @@
-FROM debian as build
+FROM node:14.18.2-stretch-slim as build
 
 ARG FRONTEND_GIT_URL=https://github.com/fluidd-core/fluidd.git
 
 ARG DEBIAN_FRONTEND=noninteractive
 WORKDIR /build
 
-RUN apt-get update && apt-get install --no-install-recommends -y git npm
+RUN apt-get update && apt-get install --no-install-recommends -y git
 RUN git clone ${FRONTEND_GIT_URL} /build
 
-RUN npm install \
+RUN npm install --loglevel verbose \
    && npm run test:unit \
    && npm run build
 
