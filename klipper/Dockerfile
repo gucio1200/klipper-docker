@@ -103,7 +103,6 @@ USER ${USER}
 
 COPY --chown=${USER}:${USER} --from=builder ${HOME}/klipper ${HOME}/klipper
 COPY --chown=${USER}:${USER} --from=builder ${KLIPPER_VENV_DIR} ${KLIPPER_VENV_DIR}
-COPY --chown=${USER}:${USER} config ${CONFIG_DIR}
 COPY --chown=${USER}:${USER} klipper/start-klipper.sh /start-klipper.sh
 
 CMD ["/start-klipper.sh"]
