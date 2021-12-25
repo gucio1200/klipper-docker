@@ -45,6 +45,7 @@ jobs:
           retention-days: 5
 
   docker:
+    needs: build_fluidd
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
