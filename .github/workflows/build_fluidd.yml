@@ -8,8 +8,10 @@ on:
       - '**'
     branches:
       - 'master'
+  workflow_dispatch:
   repository_dispatch:
     types: [fluidd]
+  
       
 jobs:
   build_fluidd:
