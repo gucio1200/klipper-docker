@@ -16,6 +16,7 @@ jobs:
           - meteyou/mainsail
           - Arksine/moonraker
           - pikvm/ustreamer
+          - fluidd-core/fluidd
           
     runs-on: ubuntu-latest
     steps:
