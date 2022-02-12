@@ -1,4 +1,4 @@
-FROM python:3.9 as builder
+FROM python:3.10 as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -38,7 +38,7 @@ RUN make && mv out out_s6
 
 WORKDIR ${HOME}
 
-FROM python:3.9-slim as image
+FROM python:3.10-slim as image
 
 ARG DEBIAN_FRONTEND=noninteractive
 
