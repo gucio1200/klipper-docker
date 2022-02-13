@@ -54,9 +54,9 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
-          key: $-buildx-$GITHUB_WORKFLOW-$
+          key: $-buildx-fluidd-$
           restore-keys: |
-            $-buildx-$GITHUB_WORKFLOW-
+            $-buildx-fluidd-
 
       - name: Download artifact
         uses: actions/download-artifact@v2

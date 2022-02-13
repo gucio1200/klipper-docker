@@ -22,9 +22,9 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
-          key: $-buildx-$GITHUB_WORKFLOW-$
+          key: $-buildx-klipper-$
           restore-keys: |
-            $-buildx-$GITHUB_WORKFLOW-
+            $-buildx-klipper-
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@master
