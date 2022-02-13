@@ -19,6 +19,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: $-buildx-${{ env.GITHUB_WORKFLOW }}-$
+          restore-keys: |
+            $-buildx-${{ env.GITHUB_WORKFLOW }}-
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@master
         with:
@@ -46,3 +53,5 @@ jobs:
           tags: gucio1200/mainsail:latest
           build-args: |
             FRONTEND_ZIP_URL=https://github.com/meteyou/mainsail/releases/latest/download/mainsail.zip
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max

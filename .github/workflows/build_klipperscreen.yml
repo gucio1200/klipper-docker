@@ -20,6 +20,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: $-buildx-${{ env.GITHUB_WORKFLOW }}-$
+          restore-keys: |
+            $-buildx-${{ env.GITHUB_WORKFLOW }}-
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@master
         with:
@@ -45,8 +52,8 @@ jobs:
           platforms: linux/arm64
           push: true
           tags: gucio1200/klipperscreen:latest
-          cache-from: type=registry,ref=gucio1200/klipperscreen:latest
-          cache-to: type=inline
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
         if: github.event_name == 'push'
         
       - name: Build
@@ -58,4 +65,6 @@ jobs:
           platforms: linux/arm64
           push: true
           tags: gucio1200/klipperscreen:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
         if: github.event_name != 'push'

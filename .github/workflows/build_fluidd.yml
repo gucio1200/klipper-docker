@@ -51,6 +51,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: $-buildx-${{ env.GITHUB_WORKFLOW }}-$
+          restore-keys: |
+            $-buildx-${{ env.GITHUB_WORKFLOW }}-
+
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
@@ -82,3 +89,5 @@ jobs:
           platforms: linux/arm64
           push: true
           tags: gucio1200/fluidd:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
