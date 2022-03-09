@@ -96,6 +96,8 @@ COPY --chown=${USER}:${USER} moonraker/start-moonraker.sh /start-moonraker.sh
 
 USER ${USER}
 
-RUN mkdir -p ${HOME}/klippy-env/bin && ln -s ${HOME}/moonraker-env/bin/python ${HOME}/klippy-env/bin/python
+RUN mkdir -p ${HOME}/klippy-env/bin \
+    && ln -s ${HOME}/moonraker-env/bin/python ${HOME}/klippy-env/bin/python \
+    && ln -s ${HOME}/moonraker-env/bin/pip ${HOME}/klippy-env/bin/pip
 
 ENTRYPOINT ["/start-moonraker.sh"]
