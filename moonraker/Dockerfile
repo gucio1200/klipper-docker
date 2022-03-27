@@ -1,4 +1,4 @@
-FROM python:3.9 as builder
+FROM python:3.10 as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -8,7 +8,7 @@ ARG MOONRAKER_VENV_DIR=${HOME}/moonraker-env
 
 RUN useradd -d ${HOME} -ms /bin/bash ${USER}
 RUN apt-get update && \
-    apt-get install -y locales git sudo wget gzip tar python-virtualenv virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
+    apt-get install -y locales git sudo wget gzip tar virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
     libffi-dev build-essential libncurses-dev libusb-dev liblmdb0 libsodium-dev
 RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
 RUN locale-gen
@@ -27,7 +27,7 @@ RUN ${MOONRAKER_VENV_DIR}/bin/python -m pip install pip -U
 RUN ${MOONRAKER_VENV_DIR}/bin/pip install wheel gpiod
 RUN ${MOONRAKER_VENV_DIR}/bin/pip install -r moonraker/scripts/moonraker-requirements.txt
 
-FROM python:3.9-slim as image
+FROM python:3.10-slim as image
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -46,6 +46,7 @@ RUN apt-get update && \
     curl \
     libsodium-dev \
     liblmdb0 \
+    iproute2 \
     python3-libgpiod && \
     sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen && \
@@ -91,9 +92,12 @@ USER root
 
 COPY --chown=${USER}:${USER} --from=builder ${HOME}/moonraker ${HOME}/moonraker
 COPY --chown=${USER}:${USER} --from=builder ${MOONRAKER_VENV_DIR} ${MOONRAKER_VENV_DIR}
-COPY --chown=${USER}:${USER} config ${CONFIG_DIR}
 COPY --chown=${USER}:${USER} moonraker/start-moonraker.sh /start-moonraker.sh
 
 USER ${USER}
+
+RUN mkdir -p ${HOME}/klippy-env/bin \
+    && ln -s ${HOME}/moonraker-env/bin/python ${HOME}/klippy-env/bin/python \
+    && ln -s ${HOME}/moonraker-env/bin/pip ${HOME}/klippy-env/bin/pip
 
 ENTRYPOINT ["/start-moonraker.sh"]

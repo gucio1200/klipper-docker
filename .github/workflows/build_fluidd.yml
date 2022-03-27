@@ -1,7 +1,7 @@
 
 ---
 
-name: Build Moonraker
+name: Build Fluidd
 on:
   push:
     tags-ignore:
@@ -10,10 +10,42 @@ on:
       - 'master'
   workflow_dispatch:
   repository_dispatch:
-    types: [moonraker]
+    types: [fluidd]
+  
       
 jobs:
+  build_fluidd:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: fluidd-core/fluidd
+          ref: develop
+ 
+      - name: Install node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+
+      - name: Install deps
+        run: npm install
+
+      - name: Run tests
+        run: npm run test:unit
+
+      - name: Build
+        run: npm run build
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: fluidd
+          path: |
+            dist
+          retention-days: 5
+
   docker:
+    needs: build_fluidd
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,9 +54,15 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
-          key: $-buildx-moonraker-$
+          key: $-buildx-fluidd-$
           restore-keys: |
-            $-buildx-moonraker-
+            $-buildx-fluidd-
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: fluidd
+          path: ./fluidd/frontend
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@master
@@ -52,12 +90,12 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           builder: ${{ steps.buildx.outputs.name }}
-          context: .
-          file: ./moonraker/Dockerfile
+          context: fluidd
+          file: ./fluidd/Dockerfile
           platforms: linux/arm64
           push: true
           tags: |
-            gucio1200/moonraker:latest
-            gucio1200/moonraker:${{ steps.time.outputs.time }}
+            gucio1200/fluidd:latest
+            gucio1200/fluidd:${{ steps.time.outputs.time }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max

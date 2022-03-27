@@ -25,7 +25,7 @@ USER ${USER}
 WORKDIR ${HOME}
 
 ### KlipperScreen setup ###
-RUN git clone https://github.com/jordanruthe/KlipperScreen.git 
+RUN git clone https://github.com/jordanruthe/KlipperScreen.git klipperscreen
 RUN [ ! -d ${KLIPPER_VENV_DIR} ] && virtualenv -p /usr/bin/python3 ${KLIPPER_VENV_DIR}
 RUN ${KLIPPER_VENV_DIR}/bin/python -m pip install pip -U
 RUN ${KLIPPER_VENV_DIR}/bin/pip install setuptools wheel pep517 p5py PyGObject

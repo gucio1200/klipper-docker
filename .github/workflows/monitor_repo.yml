@@ -11,16 +11,17 @@ jobs:
     strategy:
       matrix:
         repos:
-          - KevinOConnor/klipper
+          - Klipper3d/klipper
           - jordanruthe/KlipperScreen
           - meteyou/mainsail
           - Arksine/moonraker
           - pikvm/ustreamer
+          - fluidd-core/fluidd
           
     runs-on: ubuntu-latest
     steps:
         
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           repository:  ${{ matrix.repos }}
           fetch-depth: 0
@@ -41,7 +42,7 @@ jobs:
         if: env.UPGRADE
         
       - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v1
+        uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           event-type: ${{ env.DISPATCH_EVENT }}
