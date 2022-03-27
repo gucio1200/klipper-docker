@@ -50,9 +50,7 @@ jobs:
           file: ./klipper/Dockerfile
           platforms: linux/arm64
           push: true
-          tags: |
-            gucio1200/klipper:latest
-            gucio1200/klipper:${GITHUB_SHA::7}
+          tags: gucio1200/klipper:latest,gucio1200/klipper:${GITHUB_SHA::7}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
         if: github.event_name == 'push'
@@ -65,9 +63,7 @@ jobs:
           file: ./klipper/Dockerfile
           platforms: linux/arm64
           push: true
-          tags: |
-            gucio1200/klipper:latest
-            gucio1200/klipper:${GITHUB_SHA::7}
+          tags: gucio1200/klipper:latest,gucio1200/klipper:${GITHUB_SHA::7}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
         if: github.event_name != 'push'
