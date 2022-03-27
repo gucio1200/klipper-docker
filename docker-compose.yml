@@ -10,7 +10,7 @@ services:
     volumes:
       - klipper:/home/klippy/klipper
       - ./runtime/config:/home/klippy/.config
-      - ./runtime/logs:/logs
+      - logs:/logs
       - ./runtime/gcode_files:/home/klippy/gcode_files
       - ./runtime/scripts/gcode_shell_command.py:/home/klippy/klipper/klippy/extras/gcode_shell_command.py
       - tmp:/tmp
@@ -43,7 +43,7 @@ services:
       - klipperscreen:/home/klippy/klipperscreen
       - ./runtime/.moonraker_database:/home/klippy/.moonraker_database
       - ./runtime/config:/home/klippy/.config
-      - ./runtime/logs:/logs
+      - logs:/logs
       - ./runtime/gcode_files:/home/klippy/gcode_files
       - tmp:/tmp
       - ./runtime/scripts:/scripts
@@ -132,7 +132,7 @@ services:
     ports:
       - "8012:80"
     volumes:
-      - ./runtime/logs:/usr/share/nginx/html/logs
+      - logs:/usr/share/nginx/html/logs
       - ./runtime/gcode_files:/usr/share/nginx/html/gcode_files
       - tmp:/usr/share/nginx/html/tmp
       - ./runtime/empty:/usr/share/nginx/html
@@ -177,6 +177,10 @@ volumes:
   klipperscreen:
   moonraker:
   tmp:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  logs:
     driver_opts:
       type: tmpfs
       device: tmpfs
