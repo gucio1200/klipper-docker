@@ -35,6 +35,12 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@master
 
+      - name: Get Time
+        id: time
+        uses: nanzm/get-time-action@v1.1
+        with:
+          format: 'MMDDHH'
+
       - name: Login to DockerHub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v1
@@ -50,7 +56,9 @@ jobs:
           file: ./mainsail/Dockerfile
           platforms: linux/arm64
           push: true
-          tags: gucio1200/mainsail:latest
+          tags: |
+            gucio1200/mainsail:latest
+            gucio1200/mainsail:${{ steps.time.outputs.time }}
           build-args: |
             FRONTEND_ZIP_URL=https://github.com/meteyou/mainsail/releases/latest/download/mainsail.zip
           cache-from: type=local,src=/tmp/.buildx-cache
