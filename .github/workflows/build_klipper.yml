@@ -56,5 +56,5 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
         env:
-          GITHUB_SHA: ${{ github.sha::6 }}
+          GITHUB_SHA: ${{ GITHUB_SHA::6 }}
         
