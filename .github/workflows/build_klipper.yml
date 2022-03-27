@@ -52,9 +52,9 @@ jobs:
           push: true
           tags: |
             gucio1200/klipper:latest
-            gucio1200/klipper:${ GITHUB_SHA::6 }
+            gucio1200/klipper:$GITHUB_SHA
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
         env:
-          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_SHA: ${{ github.sha::6 }}
         
