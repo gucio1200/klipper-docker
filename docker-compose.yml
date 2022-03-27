@@ -31,7 +31,6 @@ services:
     restart: unless-stopped
     depends_on:
       - klipper
-#      - mcu
     healthcheck:
       test: ["CMD", "curl", "--silent", "--fail", "http://localhost:7125/server/info"]
       interval: 10s
@@ -150,7 +149,6 @@ services:
     container_name: "traefik"
     restart: unless-stopped
     command:
-#      - "--log.level=DEBUG"
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
