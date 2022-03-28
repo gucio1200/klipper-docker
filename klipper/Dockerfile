@@ -30,11 +30,9 @@ RUN ${KLIPPER_VENV_DIR}/bin/pip install numpy matplotlib
 
 WORKDIR ${HOME}/klipper
 
-COPY klipper/.config-linux ${HOME}/klipper/.config
-RUN make && mv out out_linux
 
-COPY klipper/.config-s6 ${HOME}/klipper/.config
-RUN make && mv out out_s6
+COPY klipper/.config ${HOME}/klipper/.config
+RUN make
 
 WORKDIR ${HOME}
 
