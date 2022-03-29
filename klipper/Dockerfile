@@ -26,7 +26,7 @@ RUN [ ! -d ${KLIPPER_VENV_DIR} ] && virtualenv -p python3 ${KLIPPER_VENV_DIR}
 RUN ${KLIPPER_VENV_DIR}/bin/python -m pip install pip -U
 RUN ${KLIPPER_VENV_DIR}/bin/pip install wheel
 RUN ${KLIPPER_VENV_DIR}/bin/pip install -r klipper/scripts/klippy-requirements.txt
-RUN ${KLIPPER_VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy matplotlib
+RUN ${KLIPPER_VENV_DIR}/bin/pip install --no-binary :all: numpy matplotlib
 
 WORKDIR ${HOME}/klipper
 
