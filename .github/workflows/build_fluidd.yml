@@ -26,7 +26,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '16'
 
       - name: Install deps
         run: npm install
