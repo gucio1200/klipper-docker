@@ -22,19 +22,17 @@ WORKDIR ${HOME}
 
 ### Klipper setup ###
 RUN git clone https://github.com/Klipper3d/klipper.git
-RUN [ ! -d ${KLIPPER_VENV_DIR} ] && virtualenv -p python2 ${KLIPPER_VENV_DIR}
+RUN [ ! -d ${KLIPPER_VENV_DIR} ] && virtualenv -p python3 ${KLIPPER_VENV_DIR}
 RUN ${KLIPPER_VENV_DIR}/bin/python -m pip install pip -U
 RUN ${KLIPPER_VENV_DIR}/bin/pip install wheel
 RUN ${KLIPPER_VENV_DIR}/bin/pip install -r klipper/scripts/klippy-requirements.txt
-RUN ${KLIPPER_VENV_DIR}/bin/pip install numpy matplotlib
+RUN ${KLIPPER_VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy matplotlib
 
 WORKDIR ${HOME}/klipper
 
-COPY klipper/.config-linux ${HOME}/klipper/.config
-RUN make && mv out out_linux
 
-COPY klipper/.config-s6 ${HOME}/klipper/.config
-RUN make && mv out out_s6
+COPY klipper/.config ${HOME}/klipper/.config
+RUN make
 
 WORKDIR ${HOME}
 
@@ -88,7 +86,7 @@ RUN useradd --user-group --no-log-init --shell /bin/false -m -d ${HOME} ${USER} 
     mkdir -p /var/log/klipper && chown ${USER}:${USER} /var/log/klipper ${HOME} && \
     pip install --no-cache gpiod
 
-RUN mkdir -p /usr/lib/python3 && ln -s /usr/local/lib/python3.9/site-packages /usr/lib/python3/dist-packages
+RUN mkdir -p /usr/lib/python3 && ln -s /usr/local/lib/python3.10/site-packages /usr/lib/python3/dist-packages
 
 USER ${USER}
 WORKDIR ${HOME}
