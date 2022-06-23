@@ -43,21 +43,23 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
-    git \
+    curl \
     gcc \
-    locales \
-    libjpeg62-turbo \
-    libtiff5 \
+    git \
     gpiod \
+    iproute2 \
+    libcurl4-openssl-dev \
+    libjpeg-dev \
+    liblmdb-dev \
     libopenjp2-7 \
+    libsodium-dev \
+    libssl-dev \
+    libtiff5 \
+    locales \
+    python2 \
+    python3-libgpiod \
     rsync \
     zlib1g-dev \
-    curl \
-    libsodium-dev \
-    liblmdb0 \
-    python3-libgpiod \
-    python \
-    libfreetype6 \
     bash && \
     sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen && \
