@@ -1,4 +1,4 @@
-FROM python:3.10 as builder
+FROM python:alpine as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -7,8 +7,8 @@ ARG HOME=/home/${USER}
 ARG KLIPPER_VENV_DIR=${HOME}/klippy-env
 
 RUN useradd -d ${HOME} -ms /bin/bash ${USER}
-RUN apt-get update && \
-    apt-get install -y locales git sudo wget gzip tar virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
+RUN apk update && \
+    apk add locales git sudo wget gzip tar virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
     build-essential avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi libusb-1.0 liblmdb0 libsodium-dev
 RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
 RUN locale-gen
