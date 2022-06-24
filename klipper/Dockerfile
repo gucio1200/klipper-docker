@@ -6,7 +6,7 @@ ARG USER=klippy
 ARG HOME=/home/${USER}
 ARG KLIPPER_VENV_DIR=${HOME}/klippy-env
 
-RUN useradd -d ${HOME} -ms /bin/bash ${USER}
+RUN adduser -h ${HOME} -s /bin/bash ${USER}
 RUN apk update && \
     apk add locales git sudo wget gzip tar virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
     build-essential avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi libusb-1.0 liblmdb0 libsodium-dev
