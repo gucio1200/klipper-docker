@@ -32,12 +32,22 @@ WORKDIR ${HOME}/klipper
 
 
 COPY klipper ${HOME}/klipper
-RUN make && \
+
+RUN cp .config-linux .config && \
+    make && \
     mv out/klipper.elf klipper.bin && \
-    mv .config .config-mcu && \
-    mv .config-linux .config && \
-    make clean && \
-    make
+    make clean 
+    
+RUN cp .config-ebb .config && \
+    make && \
+    mv out/klipper.elf klipper-ebb.bin && \
+    make clean
+    
+RUN cp .config-octopus .config && \
+    make && \
+    mv out/klipper.elf klipper-octopus.bin && \
+    make clean
+    
 WORKDIR ${HOME}
 
 FROM python:3.10-slim as image
