@@ -31,9 +31,13 @@ RUN ${KLIPPER_VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary 
 WORKDIR ${HOME}/klipper
 
 
-COPY klipper/.config ${HOME}/klipper/.config
-RUN make
-
+COPY klipper ${HOME}/klipper
+RUN make && \
+    mv out/klipper.elf klipper.bin && \
+    mv .config .config-mcu && \
+    mv .config-linux .config && \
+    make clean && \
+    make
 WORKDIR ${HOME}
 
 FROM python:3.10-slim as image
