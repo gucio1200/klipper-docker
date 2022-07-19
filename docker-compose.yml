@@ -162,15 +162,15 @@ services:
     labels:
       - com.centurylinklabs.watchtower.enable=true
 
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watcher
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: --run-once --no-restart --label-enable --interval 30
-    labels:
-      - com.centurylinklabs.watchtower.enable=true
-    restart: always
+#  watchtower:
+#    image: containrrr/watchtower
+#    container_name: watcher
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    command: --run-once --no-restart --label-enable --interval 30
+#    labels:
+#      - com.centurylinklabs.watchtower.enable=true
+#    restart: always
 
 volumes:
   klipper:
