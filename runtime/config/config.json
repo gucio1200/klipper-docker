@@ -1,0 +1,6 @@
+{
+  "remoteMode": true,
+  "instances": [
+    { "hostname": "vcore", "port": 7125 }
+  ]
+}

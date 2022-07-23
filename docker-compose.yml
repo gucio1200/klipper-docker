@@ -21,6 +21,20 @@ services:
     labels:
       - com.centurylinklabs.watchtower.enable=true
 
+  mcu:
+    image: gucio1200/klipper:latest
+    container_name: mcu
+    privileged: true
+    restart: unless-stopped
+    user: "0:0"
+    command: /home/klippy/klipper/klipper.bin -w
+    volumes:
+      - ./runtime/config:/home/klippy/.config
+      - logs:/logs
+      - ./runtime/gcode_files:/home/klippy/gcode_files
+      - tmp:/tmp
+      - /dev:/dev
+
   moonraker:
     image: gucio1200/moonraker:latest
     cpus: 4
@@ -31,7 +45,7 @@ services:
     restart: unless-stopped
     depends_on:
       - klipper
-#      - mcu
+      - mcu
     healthcheck:
       test: ["CMD", "curl", "--silent", "--fail", "http://localhost:7125/server/info"]
       interval: 10s
@@ -77,7 +91,7 @@ services:
       - com.centurylinklabs.watchtower.enable=true
 
   fluidd:
-    image: cadriel/fluidd:latest
+    image: gucio1200/fluidd:latest
     cpus: 1
     container_name: fluidd
     ports:
@@ -90,8 +104,28 @@ services:
       - moonraker:moonraker
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.fluidd.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.fluidd.rule=Host(`fluidd.vcore`)"
       - com.centurylinklabs.watchtower.enable=true
+
+  mainsail:
+    image: ghcr.io/mainsail-crew/mainsail 
+    cpus: 1
+    container_name: mainsail
+    ports:
+      - 8020:80
+    restart: unless-stopped
+    depends_on:
+      moonraker:
+        condition: service_healthy
+    links:
+      - moonraker:moonraker
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mainsail.rule=Host(`mainsail.vcore`)"
+      - com.centurylinklabs.watchtower.enable=true
+    volumes:
+      - ./runtime/config/config.json:/usr/share/nginx/html/config.json
+      - ./runtime/config:/home/klippy/.config
 
   ustreamer:
     image: gucio1200/ustreamer:latest
