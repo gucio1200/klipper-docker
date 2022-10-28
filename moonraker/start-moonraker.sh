@@ -15,4 +15,4 @@ wait_file "$klippy_uds" 10 || {
 }
 
 chown klippy:klippy /tmp/klippy_uds>>/logs/moonraker-shell.log
-/home/klippy/moonraker-env/bin/python /home/klippy/moonraker/moonraker/moonraker.py -l /logs/moonraker.log -c /home/klippy/.config/moonraker.conf
+/home/klippy/moonraker-env/bin/python /home/klippy/moonraker/moonraker/moonraker.py -l /logs/moonraker.log -c /home/klippy/.config/moonraker.conf -d /home/klippy/.config
