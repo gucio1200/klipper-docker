@@ -3,7 +3,7 @@ FROM python:3.10 as builder
 ARG DEBIAN_FRONTEND=noninteractive
 ARG USER=klippy
 ARG WORKDIR=/home/${USER}
-ARG VENV_DIR=${HOME}/venv
+ARG VENV_DIR=${WORKDIR}/venv
 
 RUN useradd -d ${WORKDIR} -ms /bin/bash ${USER}
 
