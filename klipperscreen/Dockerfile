@@ -7,6 +7,11 @@ ARG VENV_DIR=${WORKDIR}/venv
 
 RUN useradd -d ${WORKDIR} -ms /bin/bash ${USER}
 
+RUN apt update \
+ && apt install -y \
+      libgirepository1.0-dev \
+ && apt clean
+
 USER ${USER}
 WORKDIR ${WORKDIR}
 
