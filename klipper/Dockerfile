@@ -22,6 +22,8 @@ RUN ${VENV_DIR}/bin/pip install wheel
 RUN ${VENV_DIR}/bin/pip install -r klipper/scripts/klippy-requirements.txt
 RUN ${VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy matplotlib
 
+WORKDIR ${WORKDIR}/klipper
+
 COPY klipper ${WORKDIR}/klipper
 
 RUN cp .config-linux .config && \
