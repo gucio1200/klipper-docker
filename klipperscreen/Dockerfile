@@ -23,7 +23,7 @@ RUN ${VENV_DIR}/bin/pip install setuptools wheel pep517 p5py PyGObject
 RUN ${VENV_DIR}/bin/pip install $(cat klipperscreen/scripts/KlipperScreen-requirements.txt | sed -E -e /matplotlib\|vext/d )
 RUN ${VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: $(cat klipperscreen/scripts/KlipperScreen-requirements.txt | grep matplotlib)
 
-FROM arm64v8/python:slim as run
+FROM python:3-slim as run
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG USER=klippy
