@@ -22,6 +22,7 @@ FROM arm64v8/python:slim as run
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG USER=klippy
+ARG GID=1000
 ARG WORKDIR=/home/${USER}
 ARG VENV_DIR=${WORKDIR}/venv
 
@@ -48,9 +49,10 @@ RUN groupadd -g ${GID} ${USER} && \
     usermod -a -G dialout ${USER} && \
     chown -R ${USER}:${USER} ${WORKDIR}/*
 
-USER ${USER}
 COPY --chown=${USER}:${USER} --from=builder ${WORKDIR}/klipperscreen ${WORKDIR}/klipperscreen
 COPY --chown=${USER}:${USER} --from=builder ${VENV_DIR} ${VENV_DIR}
+
+USER ${USER}
 ENV DISPLAY=unix:0.0
 VOLUME ["${WORKDIR}/printer_data/config"]
 ENTRYPOINT ["${VENV_DIR}/bin/python", "klipperscreen/screen.py"]
