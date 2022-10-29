@@ -1,4 +1,4 @@
-FROM arm64v8/python:slim as builder
+FROM python:3.10 as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG USER=klippy
