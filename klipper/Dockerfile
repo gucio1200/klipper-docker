@@ -9,7 +9,7 @@ RUN useradd -d ${WORKDIR} -ms /bin/bash ${USER}
 
 RUN apt update && \
     apt install -y git sudo wget gzip tar virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
-    build-essential avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi libusb-1.0 liblmdb0 libsodium-dev
+    build-essential avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi liblmdb0 libsodium-dev
 
 USER ${USER}
 WORKDIR ${WORKDIR}
