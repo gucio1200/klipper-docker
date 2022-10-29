@@ -23,18 +23,24 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG USER=klippy
 ARG GID=1000
 ARG WORKDIR=/home/${USER}
-ENV VENV_DIR=${WORKDIR}/venv
+ARG VENV_DIR=${WORKDIR}/venv
 
 RUN apt update && \
     apt install -y \
     git \
     libjpeg62-turbo \
     libtiff5 \
+    libxcb1 \
     zlib1g \
+    libssl1.1 \
+    libcurl4 \
     curl \
     libsodium23 \
     liblmdb0 \
     iproute2 \
+    libopenjp2-7 \
+    sudo \
+    systemd \
     python3-libgpiod && \
     # Clean up
     apt-get autoremove -y && \
@@ -43,21 +49,21 @@ RUN apt update && \
 
 WORKDIR ${WORKDIR}
 COPY --from=builder ${WORKDIR}/moonraker ${WORKDIR}/moonraker
-COPY --from=builder ${WORKDIR}/venv ${WORKDIR}/venv
+COPY --from=builder ${VENV_DIR} ${VENV_DIR}
 
 RUN mkdir -p printer_data/run printer_data/gcodes printer_data/logs printer_data/database printer_data/config
 RUN groupadd -g ${GID} ${USER} && \
     useradd --no-log-init --shell /bin/false --uid 1000 --gid ${USER} -m -d ${WORKDIR} ${USER} && \
     usermod -a -G tty ${USER} && \
-    usermod -a -G dialout ${USER} \
-    && chown -R ${USER}:${USER} ${WORKDIR}/*
+    usermod -a -G dialout ${USER} && \
+    chown -R ${USER}:${USER} ${WORKDIR}/*
 
-RUN ln -s /bin/systemctl /sbin/shutdown \
- && ln -s /bin/systemctl /sbin/reboot \
- && echo -n "${USER} ALL = NOPASSWD: /bin/systemctl, /sbin/shutdown, /sbin/reboot" > /etc/sudoers.d/${USER}
+RUN ln -s /bin/systemctl /sbin/shutdown && \
+    ln -s /bin/systemctl /sbin/reboot && \
+    echo -n "${USER} ALL = NOPASSWD: /bin/systemctl, /sbin/shutdown, /sbin/reboot" > /etc/sudoers.d/${USER}
 
 USER ${USER}
 EXPOSE 7125
-VOLUME ["/home/klippy/printer_data/run", "/home/klippy/printer_data/gcodes", "/home/klippy/printer_data/logs", "/home/klippy/printer_data/database", "/home/klippy/printer_data/config"]
-ENTRYPOINT ["/home/klippy/venv/bin/python", "moonraker/moonraker/moonraker.py"]
-CMD ["-c", "/home/klippy/printer_data/config/moonraker.conf", "-d", "/home/klippy/printer_data"]
+VOLUME ["${WORKDIR}/printer_data/run", "${WORKDIR}/printer_data/gcodes", "${WORKDIR}/printer_data/logs", "${WORKDIR}/printer_data/database", "${WORKDIR}/printer_data/config"]
+ENTRYPOINT ["${VENV_DIR}/bin/python", "moonraker/moonraker/moonraker.py"]
+CMD ["-d", "${WORKDIR}/printer_data"]
