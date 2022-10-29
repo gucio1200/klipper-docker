@@ -3,13 +3,13 @@ FROM python:3.10 as builder
 ARG DEBIAN_FRONTEND=noninteractive
 
 ARG USER=klippy
-ARG HOME=/home/${USER}
-ARG VENV_DIR=${HOME}/venv
+ARG WORKDIR=/home/${USER}
+ARG VENV_DIR=${WORKDIR}/venv
 
-RUN useradd -d ${HOME} -ms /bin/bash ${USER}
+RUN useradd -d ${WORKDIR} -ms /bin/bash ${USER}
 
 USER ${USER}
-WORKDIR ${HOME}
+WORKDIR ${WORKDIR}
 
 # Install moonraker
 RUN git clone https://github.com/Arksine/moonraker.git
@@ -21,11 +21,9 @@ FROM python:3.10-slim as run
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG USER=klippy
-ARG HOME=/home/${USER}
-ENV VENV_DIR=${HOME}/venv
-ENV LC_ALL en_GB.UTF-8 
-ENV LANG en_GB.UTF-8  
-ENV LANGUAGE en_GB:en
+ARG GID=1000
+ARG WORKDIR=/home/${USER}
+ENV VENV_DIR=${WORKDIR}/venv
 
 RUN apt update && \
     apt install -y \
@@ -38,26 +36,21 @@ RUN apt update && \
     liblmdb0 \
     iproute2 \
     python3-libgpiod && \
-    sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && \
-    locale-gen && \
     # Clean up
     apt-get autoremove -y && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*   
 
-
-WORKDIR ${HOME}
-COPY --from=builder ${HOME}/moonraker ${HOME}/moonraker
-COPY --from=builder ${HOME}/venv ${HOME}/venv
-
-ARG DEVICE_GROUP=klippy
-ARG DEVICE_GID=1000
+WORKDIR ${WORKDIR}
+COPY --from=builder ${WORKDIR}/moonraker ${WORKDIR}/moonraker
+COPY --from=builder ${WORKDIR}/venv ${WORKDIR}/venv
 
 RUN mkdir -p printer_data/run printer_data/gcodes printer_data/logs printer_data/database printer_data/config
-RUN groupadd -g ${DEVICE_GID} ${DEVICE_GROUP} && \
-    useradd --no-log-init --shell /bin/false --uid 1000 --gid ${DEVICE_GROUP} -m -d ${HOME} ${USER} && \
+RUN groupadd -g ${GID} ${USER} && \
+    useradd --no-log-init --shell /bin/false --uid 1000 --gid ${USER} -m -d ${WORKDIR} ${USER} && \
     usermod -a -G tty ${USER} && \
-    usermod -a -G dialout ${USER}
+    usermod -a -G dialout ${USER} \
+    && chown -R ${USER}:${USER} ${WORKDIR}/*
 
 RUN ln -s /bin/systemctl /sbin/shutdown \
  && ln -s /bin/systemctl /sbin/reboot \
@@ -68,4 +61,3 @@ EXPOSE 7125
 VOLUME ["/home/klippy/printer_data/run", "/home/klippy/printer_data/gcodes", "/home/klippy/printer_data/logs", "/home/klippy/printer_data/database", "/home/klippy/printer_data/config"]
 ENTRYPOINT ["/home/klippy/venv/bin/python", "moonraker/moonraker/moonraker.py"]
 CMD ["-c", "/home/klippy/printer_data/config/moonraker.conf", "-d", "/home/klippy/printer_data"]
-
