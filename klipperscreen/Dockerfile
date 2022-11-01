@@ -60,7 +60,6 @@ COPY --chown=${USER}:${USER} --from=builder ${WORKDIR}/klipperscreen ${WORKDIR}/
 COPY --chown=${USER}:${USER} --from=builder ${VENV_DIR} ${VENV_DIR}
 
 USER ${USER}
-ENV DISPLAY=unix:0.0
 VOLUME ["/home/klippy/printer_data/config"]
 ENTRYPOINT ["/home/klippy/venv/bin/python", "klipperscreen/screen.py"]
 CMD ["-c", "printer_data/config/klipperscreen.conf"]
