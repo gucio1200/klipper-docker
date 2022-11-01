@@ -64,6 +64,6 @@ RUN ln -s /bin/systemctl /sbin/shutdown && \
 
 USER ${USER}
 EXPOSE 7125
-VOLUME ["${WORKDIR}/printer_data/run", "${WORKDIR}/printer_data/gcodes", "${WORKDIR}/printer_data/logs", "${WORKDIR}/printer_data/database", "${WORKDIR}/printer_data/config"]
-ENTRYPOINT ["${VENV_DIR}/bin/python", "moonraker/moonraker/moonraker.py"]
-CMD ["-d", "${WORKDIR}/printer_data"]
+VOLUME ["/home/klippy/printer_data/run", "/home/klippy/printer_data/gcodes", "/home/klippy/printer_data/logs", "/home/klippy/printer_data/database", "/home/klippy/printer_data/config"]
+ENTRYPOINT ["/home/klippy/venv/bin/python", "moonraker/moonraker/moonraker.py"]
+CMD ["-d", "/home/klippy/printer_data"]
