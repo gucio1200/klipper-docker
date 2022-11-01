@@ -3,101 +3,69 @@ FROM python:3.10 as builder
 ARG DEBIAN_FRONTEND=noninteractive
 
 ARG USER=klippy
-ARG HOME=/home/${USER}
-ARG MOONRAKER_VENV_DIR=${HOME}/moonraker-env
+ARG WORKDIR=/home/${USER}
+ARG VENV_DIR=${WORKDIR}/venv
 
-RUN useradd -d ${HOME} -ms /bin/bash ${USER}
-RUN apt-get update && \
-    apt-get install -y locales git sudo wget gzip tar virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
-    libffi-dev build-essential libncurses-dev libusb-dev liblmdb0 libsodium-dev
-RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
-RUN locale-gen
-
-ENV LC_ALL en_GB.UTF-8 
-ENV LANG en_GB.UTF-8  
-ENV LANGUAGE en_GB:en   
+RUN useradd -d ${WORKDIR} -ms /bin/bash ${USER}
 
 USER ${USER}
-WORKDIR ${HOME}
+WORKDIR ${WORKDIR}
 
 # Install moonraker
 RUN git clone https://github.com/Arksine/moonraker.git
-RUN [ ! -d ${MOONRAKER_VENV_DIR} ] && python3 -m venv ${MOONRAKER_VENV_DIR}
-RUN ${MOONRAKER_VENV_DIR}/bin/python -m pip install pip -U
-RUN ${MOONRAKER_VENV_DIR}/bin/pip install wheel gpiod
-RUN ${MOONRAKER_VENV_DIR}/bin/pip install -r moonraker/scripts/moonraker-requirements.txt
+RUN [ ! -d ${VENV_DIR} ] && python3 -m venv ${VENV_DIR}
+RUN ${VENV_DIR}/bin/python -m pip install pip -U
+RUN ${VENV_DIR}/bin/pip install -r moonraker/scripts/moonraker-requirements.txt
 
-FROM python:3.10-slim as image
+FROM python:3.10-slim as run
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG USER=klippy
+ARG GROUP=device
+ARG GID=987
+ARG WORKDIR=/home/${USER}
+ARG VENV_DIR=${WORKDIR}/venv
 
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y \
+RUN apt update && \
+    apt install -y \
     git \
-    gcc \
-    locales \
     libjpeg62-turbo \
     libtiff5 \
-    gpiod \
-    libopenjp2-7 \
-    rsync \
-    zlib1g-dev \
+    libxcb1 \
+    zlib1g \
+    libssl1.1 \
+    libcurl4 \
     curl \
-    libsodium-dev \
+    libsodium23 \
     liblmdb0 \
     iproute2 \
+    libopenjp2-7 \
+    sudo \
+    systemd \
     python3-libgpiod && \
-    sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && \
-    locale-gen && \
     # Clean up
     apt-get autoremove -y && \
     apt-get clean -y && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*   
 
-ENV LC_ALL en_GB.UTF-8 
-ENV LANG en_GB.UTF-8  
-ENV LANGUAGE en_GB:en   
+WORKDIR ${WORKDIR}
+COPY --from=builder ${WORKDIR}/moonraker ${WORKDIR}/moonraker
+COPY --from=builder ${VENV_DIR} ${VENV_DIR}
 
-ARG USER=klippy
-ARG HOME=/home/${USER}
-ENV CONFIG_DIR=${HOME}/.config
-ENV MOONRAKER_VENV_DIR=${HOME}/moonraker-env
-
-ARG DEVICE_GROUP=device
-ARG DEVICE_GID=987
-
-RUN useradd --user-group --no-log-init --shell /bin/false -m -d ${HOME} ${USER} && \
-    groupadd -g ${DEVICE_GID} ${DEVICE_GROUP} && \
-    usermod -a -G ${DEVICE_GROUP} ${USER} && \
+RUN mkdir -p printer_data/run printer_data/gcodes printer_data/logs printer_data/database printer_data/config
+RUN groupadd -g ${GID} ${GROUP} && \
+    useradd --user-group --no-log-init --shell /bin/false -m -d ${WORKDIR} ${USER} && \
+    usermod -a -G ${GROUP} ${USER} && \
     usermod -a -G tty ${USER} && \
     usermod -a -G dialout ${USER} && \
-    mkdir -p /var/log/klipper && chown ${USER}:${USER} /var/log/klipper ${HOME} && \
-    pip install --no-cache gpiod
+    chown -R ${USER}:${USER} ${WORKDIR}/*
 
-RUN mkdir -p /usr/lib/python3 && ln -s /usr/local/lib/python3.9/site-packages /usr/lib/python3/dist-packages
+RUN ln -s /bin/systemctl /sbin/shutdown && \
+    ln -s /bin/systemctl /sbin/reboot && \
+    echo -n "${USER} ALL = NOPASSWD: /bin/systemctl, /sbin/shutdown, /sbin/reboot" > /etc/sudoers.d/${USER}
 
 USER ${USER}
-WORKDIR ${HOME}
-
-RUN mkdir -p ${HOME}/gcode_files && \
-    mkdir -p ${CONFIG_DIR} && \
-    mkdir -p ${HOME}/.moonraker_database
-VOLUME ${HOME}/gcode_files
-VOLUME ${CONFIG_DIR}
-
 EXPOSE 7125
-
-USER root
-
-COPY --chown=${USER}:${USER} --from=builder ${HOME}/moonraker ${HOME}/moonraker
-COPY --chown=${USER}:${USER} --from=builder ${MOONRAKER_VENV_DIR} ${MOONRAKER_VENV_DIR}
-COPY --chown=${USER}:${USER} moonraker/start-moonraker.sh /start-moonraker.sh
-
-USER ${USER}
-
-RUN mkdir -p ${HOME}/klippy-env/bin \
-    && ln -s ${HOME}/moonraker-env/bin/python ${HOME}/klippy-env/bin/python \
-    && ln -s ${HOME}/moonraker-env/bin/pip ${HOME}/klippy-env/bin/pip
-
-ENTRYPOINT ["/start-moonraker.sh"]
+VOLUME ["/home/klippy/printer_data/run", "/home/klippy/printer_data/gcodes", "/home/klippy/printer_data/logs", "/home/klippy/printer_data/database", "/home/klippy/printer_data/config"]
+ENTRYPOINT ["/home/klippy/venv/bin/python", "moonraker/moonraker/moonraker.py"]
+CMD ["-d", "/home/klippy/printer_data"]

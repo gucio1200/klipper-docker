@@ -1,121 +1,60 @@
 FROM python:3.10 as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
-
 ARG USER=klippy
-ARG HOME=/home/${USER}
-ARG KLIPPER_VENV_DIR=${HOME}/klippy-env
+ARG WORKDIR=/home/${USER}
+ARG VENV_DIR=${WORKDIR}/venv
 
-RUN useradd -d ${HOME} -ms /bin/bash ${USER}
-RUN apt-get update && \
-    apt-get install -y locales git sudo wget gzip tar virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
-    build-essential avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi libusb-1.0 liblmdb0 libsodium-dev
-RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
-RUN locale-gen
+RUN useradd -d ${WORKDIR} -ms /bin/bash ${USER}
 
-ENV LC_ALL en_GB.UTF-8 
-ENV LANG en_GB.UTF-8  
-ENV LANGUAGE en_GB:en   
+RUN apt update && \
+    apt install -y git sudo wget gzip tar virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
+    build-essential avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi liblmdb0 libsodium-dev
 
 USER ${USER}
-WORKDIR ${HOME}
+WORKDIR ${WORKDIR}
 
 ### Klipper setup ###
 RUN git clone https://github.com/Klipper3d/klipper.git
-RUN [ ! -d ${KLIPPER_VENV_DIR} ] && virtualenv -p python3 ${KLIPPER_VENV_DIR}
-RUN ${KLIPPER_VENV_DIR}/bin/python -m pip install pip -U
-RUN ${KLIPPER_VENV_DIR}/bin/pip install wheel
-RUN ${KLIPPER_VENV_DIR}/bin/pip install -r klipper/scripts/klippy-requirements.txt
-RUN ${KLIPPER_VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy matplotlib
+RUN [ ! -d ${VENV_DIR} ] && python3 -m venv ${VENV_DIR}
+RUN ${VENV_DIR}/bin/python -m pip install pip -U && \
+    ${VENV_DIR}/bin/pip install wheel && \
+    ${VENV_DIR}/bin/pip install -r klipper/scripts/klippy-requirements.txt && \
+    ${VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy matplotlib && \
+    ${VENV_DIR}/bin/python -m compileall klipper/klippy && \
+    ${VENV_DIR}/bin/python klipper/klippy/chelper/__init__.py 
 
-WORKDIR ${HOME}/klipper
+WORKDIR ${WORKDIR}/klipper
 
-
-COPY klipper ${HOME}/klipper
+COPY klipper ${WORKDIR}/klipper
 
 RUN cp .config-linux .config && \
     make && \
     mv out/klipper.elf klipper.bin && \
     make clean 
-    
-RUN cp .config-ebb .config && \
-    make && \
-    mv out/klipper.elf klipper-ebb.bin && \
-    make clean
-    
-RUN cp .config-octopus .config && \
-    make && \
-    mv out/klipper.elf klipper-octopus.bin && \
-    make clean
-    
-WORKDIR ${HOME}
 
-FROM python:3.10-slim as image
+FROM python:3.10-slim as run
 
 ARG DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y \
-    curl \
-    gcc \
-    git \
-    gpiod \
-    iproute2 \
-    libcurl4-openssl-dev \
-    libjpeg-dev \
-    liblmdb-dev \
-    libopenjp2-7 \
-    libsodium-dev \
-    libssl-dev \
-    libtiff5 \
-    locales \
-    python2 \
-    python3-libgpiod \
-    rsync \
-    zlib1g-dev \
-    bash && \
-    sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && \
-    locale-gen && \
-    # Clean up
-    apt-get autoremove -y && \
-    apt-get clean -y && \
-    rm -rf /var/lib/apt/lists/*
-
-ENV LC_ALL en_GB.UTF-8 
-ENV LANG en_GB.UTF-8  
-ENV LANGUAGE en_GB:en   
-
 ARG USER=klippy
-ARG HOME=/home/${USER}
-ENV CONFIG_DIR=${HOME}/.config
-ENV KLIPPER_VENV_DIR=${HOME}/klippy-env
+ARG GROUP=device
+ARG GID=987
+ARG WORKDIR=/home/${USER}
+ARG VENV_DIR=${WORKDIR}/venv
 
-ARG DEVICE_GROUP=device
-ARG DEVICE_GID=987
+WORKDIR ${WORKDIR}
+COPY --from=builder ${WORKDIR}/klipper ${WORKDIR}/klipper
+COPY --from=builder ${VENV_DIR} ${VENV_DIR}
 
-RUN useradd --user-group --no-log-init --shell /bin/false -m -d ${HOME} ${USER} && \
-    groupadd -g ${DEVICE_GID} ${DEVICE_GROUP} && \
-    usermod -a -G ${DEVICE_GROUP} ${USER} && \
+RUN mkdir -p printer_data/run printer_data/gcodes printer_data/logs printer_data/config
+RUN groupadd -g ${GID} ${GROUP} && \
+    useradd --user-group --no-log-init --shell /bin/false -m -d ${WORKDIR} ${USER} && \
+    usermod -a -G ${GROUP} ${USER} && \
     usermod -a -G tty ${USER} && \
     usermod -a -G dialout ${USER} && \
-    mkdir -p /var/log/klipper && chown ${USER}:${USER} /var/log/klipper ${HOME} && \
-    pip install --no-cache gpiod
-
-RUN mkdir -p /usr/lib/python3 && ln -s /usr/local/lib/python3.10/site-packages /usr/lib/python3/dist-packages
-
+    chown -R ${USER}:${USER} ${WORKDIR}/*
+    
 USER ${USER}
-WORKDIR ${HOME}
-
-RUN mkdir -p ${HOME}/gcode_files && \
-    mkdir -p ${CONFIG_DIR} && \
-    mkdir -p ${HOME}/.moonraker_database
-VOLUME ${HOME}/gcode_files
-VOLUME ${CONFIG_DIR}
-
-USER ${USER}
-
-COPY --chown=${USER}:${USER} --from=builder ${HOME}/klipper ${HOME}/klipper
-COPY --chown=${USER}:${USER} --from=builder ${KLIPPER_VENV_DIR} ${KLIPPER_VENV_DIR}
-
-CMD /home/klippy/klippy-env/bin/python /home/klippy/klipper/klippy/klippy.py -a /tmp/klippy_uds -l /logs/klipper.log /home/klippy/.config/config/klipper.cfg
+VOLUME ["/home/klippy/printer_data/run", "/home/klippy/printer_data/gcodes", "/home/klippy/printer_data/logs", "/home/klippy/printer_data/config"]
+ENTRYPOINT ["/home/klippy/venv/bin/python", "klipper/klippy/klippy.py"]
+CMD ["-I", "printer_data/run/klipper.tty", "-a", "printer_data/run/klipper.sock", "printer_data/config/klipper.cfg", "-l", "printer_data/logs/klippy.log"]
