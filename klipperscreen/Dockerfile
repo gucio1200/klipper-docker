@@ -1,65 +1,65 @@
-FROM python:3.10 as builder
+FROM arm64v8/python:slim as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
+
 ARG USER=klippy
-ARG WORKDIR=/home/${USER}
-ARG VENV_DIR=${WORKDIR}/venv
+ARG HOME=/home/${USER}
+ARG KLIPPER_VENV_DIR=${HOME}/klipperscreen-env
 
-RUN useradd -d ${WORKDIR} -ms /bin/bash ${USER}
 
-RUN apt update \
- && apt install -y \
-      libgirepository1.0-dev \
- && apt clean
+RUN useradd -d ${HOME} -ms /bin/bash ${USER}
+RUN apt-get update && \
+    apt-get install -y locales git sudo wget gzip tar python3-distutils python3-gi \
+    python3-gi-cairo python3-virtualenv gir1.2-gtk-3.0 virtualenv matchbox-keyboard python3-dev \
+    libjpeg-dev zlib1g-dev libatlas-base-dev gobject-introspection libgirepository1.0-dev \
+    libcairo2-dev wireless-tools x11-xserver-utils xdotool
+
+RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
+RUN locale-gen
+
+ENV LC_ALL en_GB.UTF-8
+ENV LANG en_GB.UTF-8
+ENV LANGUAGE en_GB:en
 
 USER ${USER}
-WORKDIR ${WORKDIR}
+WORKDIR ${HOME}
 
 ### KlipperScreen setup ###
 RUN git clone https://github.com/jordanruthe/KlipperScreen.git klipperscreen
-RUN [ ! -d ${VENV_DIR} ] && python3 -m venv ${VENV_DIR}
-RUN ${VENV_DIR}/bin/python -m pip install pip -U
-RUN ${VENV_DIR}/bin/pip install setuptools wheel pep517 p5py PyGObject
-RUN ${VENV_DIR}/bin/pip install $(cat klipperscreen/scripts/KlipperScreen-requirements.txt | sed -E -e /matplotlib\|vext/d )
-RUN ${VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: $(cat klipperscreen/scripts/KlipperScreen-requirements.txt | grep matplotlib)
+RUN [ ! -d ${KLIPPER_VENV_DIR} ] && virtualenv -p /usr/bin/python3 ${KLIPPER_VENV_DIR}
+RUN ${KLIPPER_VENV_DIR}/bin/python -m pip install pip -U
+RUN ${KLIPPER_VENV_DIR}/bin/pip install setuptools wheel pep517 p5py PyGObject
+RUN ${KLIPPER_VENV_DIR}/bin/pip install $(cat klipperscreen/scripts/KlipperScreen-requirements.txt | sed -E -e /matplotlib\|vext/d )
+RUN ${KLIPPER_VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: $(cat klipperscreen/scripts/KlipperScreen-requirements.txt | grep matplotlib)
 
-FROM python:3-slim as run
+WORKDIR ${HOME}
+
+FROM arm64v8/python:slim as image
 
 ARG DEBIAN_FRONTEND=noninteractive
+
 ARG USER=klippy
-ARG GROUP=device
-ARG GID=987
-ARG WORKDIR=/home/${USER}
-ARG VENV_DIR=${WORKDIR}/venv
+ARG HOME=/home/${USER}
+ARG KLIPPER_VENV_DIR=${HOME}/klipperscreen-env
 
-WORKDIR ${WORKDIR}
+RUN useradd --user-group --no-log-init --shell /bin/false -m -d ${HOME} ${USER}
 
-RUN apt update && \
-    apt install -y \
-      git \
-      xdotool \
-      x11-xserver-utils \
-      libglib2.0-0 \
-      libgirepository-1.0-1 \
-      gir1.2-gtk-3.0 \
-      libopenjp2-7 \
-      fonts-freefont-ttf \
-      libcairo2 \
-      libatlas3-base \
- && apt clean
+RUN apt-get update && \
+    apt-get install -y locales git sudo libatlas-base-dev python3-distutils python3-gi \
+    python3-gi-cairo python3-virtualenv gir1.2-gtk-3.0 virtualenv matchbox-keyboard \
+    wireless-tools x11-xserver-utils xdotool curl
 
-RUN mkdir -p printer_data/config
-RUN groupadd -g ${GID} ${GROUP} && \
-    useradd --user-group --no-log-init --shell /bin/false -m -d ${WORKDIR} ${USER} && \
-    usermod -a -G ${GROUP} ${USER} && \
-    usermod -a -G tty ${USER} && \
-    usermod -a -G dialout ${USER} && \
-    chown -R ${USER}:${USER} ${WORKDIR}/*
+RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
+RUN locale-gen
 
-COPY --chown=${USER}:${USER} --from=builder ${WORKDIR}/klipperscreen ${WORKDIR}/klipperscreen
-COPY --chown=${USER}:${USER} --from=builder ${VENV_DIR} ${VENV_DIR}
+ENV LC_ALL en_GB.UTF-8
+ENV LANG en_GB.UTF-8
+ENV LANGUAGE en_GB:en
+
+COPY --chown=${USER}:${USER} --from=builder ${HOME}/klipperscreen ${HOME}/klipperscreen
+COPY --chown=${USER}:${USER} --from=builder ${KLIPPER_VENV_DIR} ${KLIPPER_VENV_DIR}
 
 USER ${USER}
-VOLUME ["/home/klippy/printer_data/config"]
-ENTRYPOINT ["/home/klippy/venv/bin/python", "klipperscreen/screen.py"]
-CMD ["-c", "printer_data/config/klipperscreen.conf"]
+WORKDIR ${HOME}/klipperscreen
+
+CMD ["/home/klippy/klipperscreen-env/bin/python","screen.py"]
