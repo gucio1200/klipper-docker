@@ -21,7 +21,8 @@ FROM python:3.10-slim as run
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG USER=klippy
-ARG GID=1000
+ARG GROUP=device
+ARG GID=987
 ARG WORKDIR=/home/${USER}
 ARG VENV_DIR=${WORKDIR}/venv
 
@@ -52,8 +53,9 @@ COPY --from=builder ${WORKDIR}/moonraker ${WORKDIR}/moonraker
 COPY --from=builder ${VENV_DIR} ${VENV_DIR}
 
 RUN mkdir -p printer_data/run printer_data/gcodes printer_data/logs printer_data/database printer_data/config
-RUN groupadd -g ${GID} ${USER} && \
-    useradd --no-log-init --shell /bin/false --uid 1000 --gid ${USER} -m -d ${WORKDIR} ${USER} && \
+RUN groupadd -g ${GID} ${GROUP} && \
+    useradd --user-group --no-log-init --shell /bin/false -m -d ${WORKDIR} ${USER} && \
+    usermod -a -G ${GROUP} ${USER} && \
     usermod -a -G tty ${USER} && \
     usermod -a -G dialout ${USER} && \
     chown -R ${USER}:${USER} ${WORKDIR}/*
