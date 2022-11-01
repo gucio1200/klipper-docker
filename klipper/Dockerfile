@@ -55,4 +55,4 @@ RUN groupadd -g ${GID} ${USER} && \
 USER ${USER}
 VOLUME ["/home/klippy/printer_data/run", "/home/klippy/printer_data/gcodes", "/home/klippy/printer_data/logs", "/home/klippy/printer_data/config"]
 ENTRYPOINT ["/home/klippy/venv/bin/python", "klipper/klippy/klippy.py"]
-CMD ["-I", "printer_data/run/klipper.tty", "-a", "printer_data/run/klipper.sock", "printer_data/config/printer.cfg", "-l", "printer_data/logs/klippy.log"]
+CMD ["-I", "printer_data/run/klipper.tty", "-a", "printer_data/run/klipper.sock", "printer_data/config/klipper.cfg", "-l", "printer_data/logs/klippy.log"]
