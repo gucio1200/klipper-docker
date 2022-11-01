@@ -9,15 +9,17 @@ services:
     restart: unless-stopped
     volumes:
       - klipper:/home/klippy/klipper
-      - ./runtime/config:/home/klippy/.config
-      - logs:/logs
-      - ./runtime/gcode_files:/home/klippy/gcode_files
-      - ./runtime/scripts/gcode_shell_command.py:/home/klippy/klipper/klippy/extras/gcode_shell_command.py
+      - ./runtime/config:/home/klippy/printer_data/config
+      - ./runtime/gcodes:/home/klippy/printer_data/gcodes
+      - logs:/home/klippy/printer_data/logs
+      - run:/home/klippy/printer_data/run
       - tmp:/tmp
-      - ./runtime/scripts:/scripts
       - /dev:/dev
+      - ./runtime/scripts:/scripts
+      - ./runtime/scripts/gcode_shell_command.py:/home/klippy/klipper/klippy/extras/gcode_shell_command.py
     devices:
       - /dev/klipper:/dev/klipper
+      - /dev/toolboard:/dev/toolboard
     labels:
       - com.centurylinklabs.watchtower.enable=true
 
@@ -27,12 +29,15 @@ services:
     privileged: true
     restart: unless-stopped
     user: "0:0"
+    entrypoint: [""]
     command: /home/klippy/klipper/klipper.bin -w
     volumes:
-      - ./runtime/config:/home/klippy/.config
-      - logs:/logs
-      - ./runtime/gcode_files:/home/klippy/gcode_files
-      - tmp:/tmp
+      - klipper:/home/klippy/klipper
+      - ./runtime/config:/home/klippy/printer_data/config
+      - ./runtime/gcodes:/home/klippy/printer_data/gcodes
+      - logs:/home/klippy/printer_data/logs
+      - run:/home/klippy/printer_data/run  
+      - tmp:/tmp 
       - /dev:/dev
 
   moonraker:
@@ -55,13 +60,14 @@ services:
       - klipper:/home/klippy/klipper
       - moonraker:/home/klippy/moonraker
       - klipperscreen:/home/klippy/klipperscreen
-      - ./runtime/.moonraker_database:/home/klippy/.moonraker_database
-      - ./runtime/config:/home/klippy/.config
-      - logs:/logs
-      - ./runtime/gcode_files:/home/klippy/gcode_files
-      - tmp:/tmp
-      - ./runtime/scripts:/scripts
+      - ./runtime/config:/home/klippy/printer_data/config
+      - ./runtime/gcodes:/home/klippy/printer_data/gcodes
+      - logs:/home/klippy/printer_data/logs
+      - run:/home/klippy/printer_data/run
+      - ./runtime/moonraker-db:/home/klippy/printer_data/database  
+      - tmp:/tmp 
       - /dev:/dev
+      - ./runtime/scripts:/scripts
     labels:
       - com.centurylinklabs.watchtower.enable=true
 
@@ -83,6 +89,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    volumes:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - klipperscreen:/home/klippy/klipperscreen
@@ -141,6 +148,10 @@ services:
     devices:
       - /dev/video0:/dev/video0
     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cam.rule=Host(`cam.vcore`)"
+      - "traefik.http.middlewares.cors.headers.accesscontrolalloworiginlist=http://mainsail.vcore"
+      - "traefik.http.routers.cam.middlewares=cors"
       - com.centurylinklabs.watchtower.enable=true
 
   portainer:
@@ -167,7 +178,6 @@ services:
       - "8012:80"
     volumes:
       - logs:/usr/share/nginx/html/logs
-      - ./runtime/gcode_files:/usr/share/nginx/html/gcode_files
       - tmp:/usr/share/nginx/html/tmp
       - ./runtime/empty:/usr/share/nginx/html
       - ./runtime/default.conf:/etc/nginx/conf.d/default.conf
@@ -210,6 +220,10 @@ volumes:
   klipper:
   klipperscreen:
   moonraker:
+  run:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
   tmp:
     driver_opts:
       type: tmpfs
