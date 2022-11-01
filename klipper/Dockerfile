@@ -51,6 +51,6 @@ RUN groupadd -g ${GID} ${USER} && \
     chown -R ${USER}:${USER} ${WORKDIR}/*
     
 USER ${USER}
-VOLUME ["${WORKDIR}/printer_data/run", "${WORKDIR}/printer_data/gcodes", "${WORKDIR}/printer_data/logs", "${WORKDIR}/printer_data/config"]
-ENTRYPOINT ["${VENV_DIR}/bin/python", "klipper/klippy/klippy.py"]
+VOLUME ["/home/klippy/printer_data/run", "/home/klippy/printer_data/gcodes", "/home/klippy/printer_data/logs", "/home/klippy/printer_data/config"]
+ENTRYPOINT ["/home/klippy/venv/bin/python", "klipper/klippy/klippy.py"]
 CMD ["-I", "printer_data/run/klipper.tty", "-a", "printer_data/run/klipper.sock", "printer_data/config/printer.cfg", "-l", "printer_data/logs/klippy.log"]
