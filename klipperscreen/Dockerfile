@@ -30,7 +30,7 @@ RUN [ ! -d ${KLIPPER_VENV_DIR} ] && virtualenv -p /usr/bin/python3 ${KLIPPER_VEN
 RUN ${KLIPPER_VENV_DIR}/bin/python -m pip install pip -U
 RUN ${KLIPPER_VENV_DIR}/bin/pip install setuptools wheel pep517 p5py PyGObject
 RUN ${KLIPPER_VENV_DIR}/bin/pip install $(cat klipperscreen/scripts/KlipperScreen-requirements.txt | sed -E -e /matplotlib\|vext/d )
-RUN ${KLIPPER_VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: $(cat klipperscreen/scripts/KlipperScreen-requirements.txt | grep matplotlib)
+# RUN ${KLIPPER_VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: $(cat klipperscreen/scripts/KlipperScreen-requirements.txt | grep matplotlib)
 
 WORKDIR ${HOME}
 
