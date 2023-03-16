@@ -42,6 +42,9 @@ ARG GID=987
 ARG WORKDIR=/home/${USER}
 ARG VENV_DIR=${WORKDIR}/venv
 
+RUN apt update && \
+    apt install -y libtiff5 libopenjp2-7 libjpeg62 libxcb-util1
+
 WORKDIR ${WORKDIR}
 COPY --from=builder ${WORKDIR}/klipper ${WORKDIR}/klipper
 COPY --from=builder ${VENV_DIR} ${VENV_DIR}
