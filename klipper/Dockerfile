@@ -8,7 +8,7 @@ ARG VENV_DIR=${WORKDIR}/venv
 RUN useradd -d ${WORKDIR} -ms /bin/bash ${USER}
 
 RUN apt update && \
-    apt install -y git sudo wget gzip tar virtualenv libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
+    apt install -y git sudo wget gzip tar virtualenv libffi-dev libtiff6 libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
     build-essential avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi liblmdb0 libsodium-dev
 
 USER ${USER}
@@ -44,7 +44,7 @@ ARG WORKDIR=/home/${USER}
 ARG VENV_DIR=${WORKDIR}/venv
 
 RUN apt update && \
-    apt install -y libopenjp2-7 libjpeg62 libxcb-util1 build-essential avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi
+    apt install -y libtiff6 libopenjp2-7 libjpeg62 libxcb-util1 build-essential avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi
 
 WORKDIR ${WORKDIR}
 COPY --from=builder ${WORKDIR}/klipper ${WORKDIR}/klipper
