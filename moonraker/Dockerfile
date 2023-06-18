@@ -30,10 +30,10 @@ RUN apt update && \
     apt install -y \
     git \
     libjpeg62-turbo \
-    libtiff5 \
+    libtiff6 \
     libxcb1 \
     zlib1g \
-    libssl1.1 \
+    libssl3 \
     libcurl4 \
     curl \
     libsodium23 \
