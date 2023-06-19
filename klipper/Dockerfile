@@ -9,7 +9,7 @@ RUN useradd -d ${WORKDIR} -ms /bin/bash ${USER}
 
 RUN apt update && \
     apt install -y git sudo wget gzip tar virtualenv libffi-dev libtiff6 libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
-    build-essential avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi liblmdb0 libsodium-dev
+    build-essential cmake avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi liblmdb0 libsodium-dev
 
 USER ${USER}
 WORKDIR ${WORKDIR}
@@ -20,7 +20,7 @@ RUN [ ! -d ${VENV_DIR} ] && python3 -m venv ${VENV_DIR}
 RUN ${VENV_DIR}/bin/pip install wheel && \
     ${VENV_DIR}/bin/pip install -r klipper/scripts/klippy-requirements.txt
     
-RUN ${VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy matplotlib -vvv
+RUN ${VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy matplotlib -v
 RUN ${VENV_DIR}/bin/python -m compileall klipper/klippy
 RUN ${VENV_DIR}/bin/python klipper/klippy/chelper/__init__.py
 
