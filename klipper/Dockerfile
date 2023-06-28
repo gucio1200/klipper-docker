@@ -1,4 +1,4 @@
-FROM python:3.10 as builder
+FROM python:3-bookworm as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG USER=klippy
@@ -8,8 +8,8 @@ ARG VENV_DIR=${WORKDIR}/venv
 RUN useradd -d ${WORKDIR} -ms /bin/bash ${USER}
 
 RUN apt update && \
-    apt install -y git sudo wget gzip tar virtualenv libffi-dev libtiff6 libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
-    build-essential cmake avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi liblmdb0 libsodium-dev
+    apt install -y git sudo wget gzip tar virtualenv libffi-dev pkg-config libncurses-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
+    build-essential cmake avrdude gcc-avr binutils-avr avr-libc stm32flash dfu-util libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi liblmdb0 libsodium-dev libusb-1.0-0 libusb-1.0-0-dev
 
 USER ${USER}
 WORKDIR ${WORKDIR}
@@ -20,7 +20,7 @@ RUN [ ! -d ${VENV_DIR} ] && python3 -m venv ${VENV_DIR}
 RUN ${VENV_DIR}/bin/pip install wheel && \
     ${VENV_DIR}/bin/pip install -r klipper/scripts/klippy-requirements.txt
     
-RUN ${VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy==1.24.3 matplotlib -v
+RUN ${VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy matplotlib -v
 RUN ${VENV_DIR}/bin/python -m compileall klipper/klippy
 RUN ${VENV_DIR}/bin/python klipper/klippy/chelper/__init__.py
 
@@ -28,12 +28,7 @@ WORKDIR ${WORKDIR}/klipper
 
 COPY klipper ${WORKDIR}/klipper
 
-RUN cp .config-linux .config && \
-    make && \
-    mv out/klipper.elf klipper.bin && \
-    make clean 
-
-FROM python:3.10-slim as run
+FROM python:3-slim-bookworm as run
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG USER=klippy
@@ -43,7 +38,8 @@ ARG WORKDIR=/home/${USER}
 ARG VENV_DIR=${WORKDIR}/venv
 
 RUN apt update && \
-    apt install -y libtiff6 libopenjp2-7 libjpeg62 libxcb-util1 build-essential avrdude gcc-avr binutils-avr avr-libc stm32flash libnewlib-arm-none-eabi gcc-arm-none-eabi
+    apt install -y git sudo wget gzip tar virtualenv libffi-dev pkg-config libncurses-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
+    build-essential cmake avrdude gcc-avr binutils-avr avr-libc stm32flash dfu-util libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi liblmdb0 libsodium-dev libusb-1.0-0 libusb-1.0-0-dev
 
 WORKDIR ${WORKDIR}
 COPY --from=builder ${WORKDIR}/klipper ${WORKDIR}/klipper
