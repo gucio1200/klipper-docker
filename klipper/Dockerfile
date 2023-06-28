@@ -18,11 +18,10 @@ WORKDIR ${WORKDIR}
 RUN git clone https://github.com/Klipper3d/klipper.git
 RUN [ ! -d ${VENV_DIR} ] && python3 -m venv ${VENV_DIR}
 RUN ${VENV_DIR}/bin/pip install wheel && \
-    ${VENV_DIR}/bin/pip install -r klipper/scripts/klippy-requirements.txt
-    
-RUN ${VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy matplotlib -v
-RUN ${VENV_DIR}/bin/python -m compileall klipper/klippy
-RUN ${VENV_DIR}/bin/python klipper/klippy/chelper/__init__.py
+    ${VENV_DIR}/bin/pip install -r klipper/scripts/klippy-requirements.txt && \
+    ${VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy matplotlib -v && \
+    ${VENV_DIR}/bin/python -m compileall klipper/klippy && \
+    ${VENV_DIR}/bin/python klipper/klippy/chelper/__init__.py
 
 WORKDIR ${WORKDIR}/klipper
 
