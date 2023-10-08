@@ -1,4 +1,4 @@
-FROM python:3-bookworm as builder
+FROM python:3.11-bookworm as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG USER=klippy
@@ -27,7 +27,7 @@ WORKDIR ${WORKDIR}/klipper
 
 COPY klipper ${WORKDIR}/klipper
 
-FROM python:3-slim-bookworm as run
+FROM python:3.11-slim-bookworm as run
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG USER=klippy
