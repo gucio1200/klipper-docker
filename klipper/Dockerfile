@@ -8,7 +8,8 @@ ARG VENV_DIR=${WORKDIR}/venv
 RUN useradd -d ${WORKDIR} -ms /bin/bash ${USER}
 
 RUN apt update && \
-    apt install -y git sudo wget gzip tar virtualenv libffi-dev pkg-config libncurses-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
+    apt install -y git sudo wget gzip tar virtualenv libffi-dev pkg-config libncurses-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod  \
+    libopenblas-dev \
     build-essential cmake avrdude gcc-avr binutils-avr avr-libc stm32flash dfu-util libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi liblmdb0 libsodium-dev libusb-1.0-0 libusb-1.0-0-dev
 
 USER ${USER}
@@ -19,7 +20,8 @@ RUN git clone https://github.com/Klipper3d/klipper.git
 RUN [ ! -d ${VENV_DIR} ] && python3 -m venv ${VENV_DIR}
 #RUN ${VENV_DIR}/bin/pip install wheel && \
 RUN ${VENV_DIR}/bin/pip install -r klipper/scripts/klippy-requirements.txt
-RUN ${VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy==1.25.2 matplotlib -v --config-settings=setup-args="-Dallow-noblas=true" 
+RUN ${VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: numpy==1.25.2 -v --config-settings=setup-args="-Dallow-noblas=true" -C-Dallow-noblas=true
+RUN ${VENV_DIR}/bin/pip install --upgrade --force-reinstall --no-binary :all: matplotlib -v --config-settings=setup-args="-Dallow-noblas=true" -C-Dallow-noblas=true
 RUN ${VENV_DIR}/bin/python -m compileall klipper/klippy
 RUN ${VENV_DIR}/bin/python klipper/klippy/chelper/__init__.py
 
