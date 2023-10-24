@@ -19,6 +19,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: $-buildx-klipper-$
+          restore-keys: |
+            $-buildx-klipper-
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@master
         with:
@@ -52,6 +59,6 @@ jobs:
           tags: |
             gucio1200/klipper:latest
             gucio1200/klipper:${{ steps.time.outputs.time }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
         
