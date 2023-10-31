@@ -9,7 +9,7 @@ RUN useradd -d ${WORKDIR} -ms /bin/bash ${USER}
 
 RUN apt update && \
     apt install -y git sudo wget gzip tar virtualenv libffi-dev pkg-config libncurses-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod  \
-    libopenblas-dev build-essential cmake avrdude gcc-avr binutils-avr avr-libc stm32flash dfu-util libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi liblmdb0 libsodium-dev libusb-1.0-0 libusb-1.0-0-dev
+    build-essential cmake avrdude gcc-avr binutils-avr avr-libc stm32flash dfu-util libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi liblmdb0 libsodium-dev libusb-1.0-0 libusb-1.0-0-dev
 
 USER ${USER}
 WORKDIR ${WORKDIR}
@@ -38,7 +38,7 @@ ARG VENV_DIR=${WORKDIR}/venv
 
 RUN apt update && \
     apt install -y git sudo wget gzip tar virtualenv libjpeg62 libtiff6 pkg-config libncurses-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod \
-    libopenblas-dev build-essential cmake avrdude gcc-avr binutils-avr avr-libc stm32flash dfu-util libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi liblmdb0 libsodium-dev libusb-1.0-0 libusb-1.0-0-dev
+    build-essential cmake avrdude gcc-avr binutils-avr avr-libc stm32flash dfu-util libnewlib-arm-none-eabi gcc-arm-none-eabi binutils-arm-none-eabi liblmdb0 libsodium-dev libusb-1.0-0 libusb-1.0-0-dev
 
 WORKDIR ${WORKDIR}
 COPY --from=builder ${WORKDIR}/klipper ${WORKDIR}/klipper
