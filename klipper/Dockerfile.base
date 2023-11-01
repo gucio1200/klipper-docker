@@ -1,7 +1,7 @@
 FROM python:3.11-bookworm as blas
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG BLAS_VERSION=v0.3.24
+ENV BLAS_VERSION v0.3.24
 
 RUN apt update && \
     apt install -y git sudo wget gzip tar virtualenv libffi-dev pkg-config libncurses-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod  \
