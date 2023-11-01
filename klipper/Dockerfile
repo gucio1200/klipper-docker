@@ -21,10 +21,19 @@ RUN git clone https://github.com/Klipper3d/klipper.git && \
 WORKDIR ${WORKDIR}/klipper
 
 COPY klipper/config/linux.config .config
-RUN cat .config && \
-    make flash
+RUN make && \
+    mv out/klipper.elf klipper.bin && \
+    rm -rf out
 
-#COPY klipper ${WORKDIR}/klipper
+COPY klipper/config/octopus.config .config
+RUN make && \
+    mv out/klipper.elf octopus.bin && \
+    rm -rf out
+
+COPY klipper/config/ebb.config .config
+RUN make && \
+    mv out/klipper.elf ebb.bin && \
+    rm -rf out
 
 FROM gucio1200/klipper:base-latest as run
 
