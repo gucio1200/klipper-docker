@@ -1,6 +1,7 @@
 printer.cfg
 !config/printer.cfg
 .config
+runtime/gcodes/**
 runtime/portainer/**
 runtime/logs/**
 runtime/tmp/**

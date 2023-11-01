@@ -3,7 +3,7 @@ version: '2.4'
 services:
 
   klipper:
-    image: gucio1200/klipper:latest
+    image: gucio1200/klipper:
     cpus: 4
     container_name: klipper
     restart: unless-stopped
@@ -17,14 +17,14 @@ services:
       - /dev:/dev
       - ./runtime/scripts:/scripts
       - ./runtime/scripts/gcode_shell_command.py:/home/klippy/klipper/klippy/extras/gcode_shell_command.py
-    devices:
-      - /dev/klipper:/dev/klipper
-      - /dev/toolboard:/dev/toolboard
+#    devices:
+#      - /dev/klipper:/dev/klipper
+#      - /dev/toolboard:/dev/toolboard
     labels:
       - com.centurylinklabs.watchtower.enable=true
 
   mcu:
-    image: gucio1200/klipper:latest
+    image: gucio1200/klipper:091113
     container_name: mcu
     privileged: true
     restart: unless-stopped
@@ -36,21 +36,21 @@ services:
       - ./runtime/config:/home/klippy/printer_data/config
       - ./runtime/gcodes:/home/klippy/printer_data/gcodes
       - logs:/home/klippy/printer_data/logs
-      - run:/home/klippy/printer_data/run  
-      - tmp:/tmp 
+      - run:/home/klippy/printer_data/run
+      - tmp:/tmp
       - /dev:/dev
 
   moonraker:
     image: gucio1200/moonraker:latest
-    cpus: 4
+    cpus: 2
     container_name: moonraker
     privileged: true
     ports:
       - 7125:7125
     restart: unless-stopped
-    depends_on:
-      - klipper
-      - mcu
+#    depends_on:
+#      - klipper
+#      - mcu
     healthcheck:
       test: ["CMD", "curl", "--silent", "--fail", "http://localhost:7125/server/info"]
       interval: 10s
@@ -64,8 +64,8 @@ services:
       - ./runtime/gcodes:/home/klippy/printer_data/gcodes
       - logs:/home/klippy/printer_data/logs
       - run:/home/klippy/printer_data/run
-      - ./runtime/moonraker-db:/home/klippy/printer_data/database  
-      - tmp:/tmp 
+      - ./runtime/moonraker-db:/home/klippy/printer_data/database
+      - tmp:/tmp
       - /dev:/dev
       - ./runtime/scripts:/scripts
     labels:
@@ -90,32 +90,14 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-    volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - klipperscreen:/home/klippy/klipperscreen
       - ./runtime/config/KlipperScreen.conf:/home/klippy/KlipperScreen.conf
     labels:
       - com.centurylinklabs.watchtower.enable=true
 
-  fluidd:
-    image: gucio1200/fluidd:latest
-    cpus: 1
-    container_name: fluidd
-    ports:
-      - 8010:80
-    restart: unless-stopped
-    depends_on:
-      moonraker:
-        condition: service_healthy
-    links:
-      - moonraker:moonraker
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.fluidd.rule=Host(`fluidd.vcore`)"
-      - com.centurylinklabs.watchtower.enable=true
-
   mainsail:
-    image: ghcr.io/mainsail-crew/mainsail 
+    image: ghcr.io/mainsail-crew/mainsail
     cpus: 1
     container_name: mainsail
     ports:
@@ -136,7 +118,7 @@ services:
 
   ustreamer:
     image: gucio1200/ustreamer:latest
-    cpus: 1
+    cpus: 2
     build:
       dockerfile: ./ustreamer/Dockerfile
       context: .
@@ -171,7 +153,7 @@ services:
 
   nginx:
     image: nginx:latest
-    cpus: 0.5
+    cpus: 0.1
     container_name: nginx
     restart: unless-stopped
     ports:

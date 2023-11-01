@@ -1,6 +1,7 @@
 {
-  "remoteMode": true,
-  "instances": [
-    { "hostname": "vcore", "port": 7125 }
-  ]
+    "defaultLocale": "en",
+    "hostname": "vcore",
+    "port": 7125,
+    "instancesDB": "moonraker",
+    "instances": []
 }
