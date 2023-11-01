@@ -2,10 +2,18 @@ FROM gucio1200/klipper:base-latest as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG USER=klippy
+ARG GROUP=device
+ARG GID=987
 ARG WORKDIR=/home/${USER}
 ARG VENV_DIR=${WORKDIR}/venv
 
-RUN useradd -d ${WORKDIR} -ms /bin/bash ${USER}
+RUN mkdir -p printer_data/run printer_data/gcodes printer_data/logs printer_data/config
+RUN groupadd -g ${GID} ${GROUP} && \
+    useradd --user-group --no-log-init --shell /bin/false -m -d ${WORKDIR} ${USER} && \
+    usermod -a -G ${GROUP} ${USER} && \
+    usermod -a -G tty ${USER} && \
+    usermod -a -G dialout ${USER} && \
+    chown -R ${USER}:${USER} ${WORKDIR}/*
 
 USER ${USER}
 WORKDIR ${WORKDIR}
@@ -34,27 +42,6 @@ COPY klipper/config/ebb.config .config
 RUN make && \
     mv out/klipper.elf ebb.bin && \
     rm -rf out
-
-FROM gucio1200/klipper:base-latest as run
-
-ARG DEBIAN_FRONTEND=noninteractive
-ARG USER=klippy
-ARG GROUP=device
-ARG GID=987
-ARG WORKDIR=/home/${USER}
-ARG VENV_DIR=${WORKDIR}/venv
-
-WORKDIR ${WORKDIR}
-COPY --from=builder ${WORKDIR}/klipper ${WORKDIR}/klipper
-COPY --from=builder ${VENV_DIR} ${VENV_DIR}
-
-RUN mkdir -p printer_data/run printer_data/gcodes printer_data/logs printer_data/config
-RUN groupadd -g ${GID} ${GROUP} && \
-    useradd --user-group --no-log-init --shell /bin/false -m -d ${WORKDIR} ${USER} && \
-    usermod -a -G ${GROUP} ${USER} && \
-    usermod -a -G tty ${USER} && \
-    usermod -a -G dialout ${USER} && \
-    chown -R ${USER}:${USER} ${WORKDIR}/*
     
 USER ${USER}
 VOLUME ["/home/klippy/printer_data/run", "/home/klippy/printer_data/gcodes", "/home/klippy/printer_data/logs", "/home/klippy/printer_data/config"]
