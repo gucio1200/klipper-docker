@@ -13,7 +13,7 @@ RUN groupadd -g ${GID} ${GROUP} && \
     usermod -a -G ${GROUP} ${USER} && \
     usermod -a -G tty ${USER} && \
     usermod -a -G dialout ${USER} && \
-    chown -R ${USER}:${USER} ${WORKDIR}/*
+    chown -R ${USER}:${USER} ${WORKDIR}
 
 USER ${USER}
 WORKDIR ${WORKDIR}
