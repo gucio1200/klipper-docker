@@ -3,7 +3,7 @@ version: '2.4'
 services:
 
   klipper:
-    image: gucio1200/klipper:
+    image: gucio1200/klipper:latest
     cpus: 4
     container_name: klipper
     restart: unless-stopped
@@ -24,7 +24,7 @@ services:
       - com.centurylinklabs.watchtower.enable=true
 
   mcu:
-    image: gucio1200/klipper:091113
+    image: gucio1200/klipper:latest
     container_name: mcu
     privileged: true
     restart: unless-stopped
@@ -48,9 +48,9 @@ services:
     ports:
       - 7125:7125
     restart: unless-stopped
-#    depends_on:
-#      - klipper
-#      - mcu
+    depends_on:
+      - klipper
+      - mcu
     healthcheck:
       test: ["CMD", "curl", "--silent", "--fail", "http://localhost:7125/server/info"]
       interval: 10s
@@ -134,21 +134,6 @@ services:
       - "traefik.http.routers.cam.rule=Host(`cam.vcore`)"
       - "traefik.http.middlewares.cors.headers.accesscontrolalloworiginlist=http://mainsail.vcore"
       - "traefik.http.routers.cam.middlewares=cors"
-      - com.centurylinklabs.watchtower.enable=true
-
-  portainer:
-    image: portainer/portainer-ce:latest
-    cpus: 0.5
-    container_name: portainer
-    ports:
-      - "9000:9000"
-      - "8000:8000"
-    command: -H unix:///var/run/docker.sock
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./runtime/portainer:/data
-    labels:
       - com.centurylinklabs.watchtower.enable=true
 
   nginx:
