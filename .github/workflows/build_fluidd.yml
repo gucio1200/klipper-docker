@@ -94,7 +94,7 @@ jobs:
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: fluidd
-          file: ./fluidd/Dockerfile
+          file: ./docker/fluidd/Dockerfile
           platforms: linux/arm64
           push: true
           tags: |
