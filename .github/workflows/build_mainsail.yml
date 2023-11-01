@@ -52,8 +52,8 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           builder: ${{ steps.buildx.outputs.name }}
-          context: mainsail
-          file: ./mainsail/Dockerfile
+          context: docker/mainsail
+          file: ./docker/mainsail/Dockerfile
           platforms: linux/arm64
           push: true
           tags: |

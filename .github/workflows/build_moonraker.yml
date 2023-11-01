@@ -53,7 +53,7 @@ jobs:
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
-          file: ./moonraker/Dockerfile
+          file: ./docker/moonraker/Dockerfile
           platforms: linux/arm64
           push: true
           tags: |

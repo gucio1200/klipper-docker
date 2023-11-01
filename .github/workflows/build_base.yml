@@ -53,7 +53,7 @@ jobs:
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
-          file: ./klipper/Dockerfile.base
+          file: ./docker/klipper/Dockerfile.base
           platforms: linux/arm64
           push: true
           tags: |

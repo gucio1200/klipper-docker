@@ -1,0 +1,33 @@
+[server]
+host = 0.0.0.0
+port = 7125
+klippy_uds_address = /home/klippy/printer_data/run/klipper.sock
+
+[authorization]
+cors_domains = 
+	http://*
+trusted_clients = 
+	0.0.0.0/0
+
+[octoprint_compat]
+
+[history]
+
+[machine]
+provider = none
+validate_service = False
+
+[job_queue]
+
+[file_manager]
+
+[update_manager]
+enable_auto_refresh = True
+enable_system_updates = False
+
+[update_manager klipperscreen]
+type = git_repo
+path = /home/klippy/klipperscreen
+origin = https://github.com/jordanruthe/klipperscreen.git
+is_system_service = False
+

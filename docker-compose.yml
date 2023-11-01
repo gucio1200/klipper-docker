@@ -17,9 +17,9 @@ services:
       - /dev:/dev
       - ./runtime/scripts:/scripts
       - ./runtime/scripts/gcode_shell_command.py:/home/klippy/klipper/klippy/extras/gcode_shell_command.py
-#    devices:
-#      - /dev/klipper:/dev/klipper
-#      - /dev/toolboard:/dev/toolboard
+    devices:
+      - /dev/klipper:/dev/klipper
+      - /dev/toolboard:/dev/toolboard
     labels:
       - com.centurylinklabs.watchtower.enable=true
 
