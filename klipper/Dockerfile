@@ -21,7 +21,8 @@ RUN git clone https://github.com/Klipper3d/klipper.git && \
 WORKDIR ${WORKDIR}/klipper
 
 COPY klipper/config/linux.config .config
-RUN make flash
+RUN cat .config && \
+    make flash
 
 #COPY klipper ${WORKDIR}/klipper
 
