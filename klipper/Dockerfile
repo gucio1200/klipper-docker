@@ -13,9 +13,8 @@ WORKDIR ${WORKDIR}
 ### Klipper setup ###
 RUN git clone https://github.com/Klipper3d/klipper.git
 RUN [ ! -d ${VENV_DIR} ] && python3 -m venv ${VENV_DIR}
-RUN ${VENV_DIR}/bin/pip install wheel
 RUN ${VENV_DIR}/bin/pip install -r klipper/scripts/klippy-requirements.txt
-RUN ${VENV_DIR}/bin/pip install --no-binary :all: matplotlib numpy
+RUN ${VENV_DIR}/bin/pip install matplotlib numpy==1.25.2
 RUN ${VENV_DIR}/bin/python -m compileall klipper/klippy
 RUN ${VENV_DIR}/bin/python klipper/klippy/chelper/__init__.py
 
