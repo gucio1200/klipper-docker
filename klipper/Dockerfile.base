@@ -10,4 +10,4 @@ RUN apt update && \
 RUN git clone -b $BLAS_VERSION https://github.com/OpenMathLib/OpenBLAS && \
     cd OpenBLAS && make TARGET=CORTEXA53 && \
     make TARGET=CORTEXA53 all && \
-    make install
+    make TARGET=CORTEXA53 install
