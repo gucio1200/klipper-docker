@@ -93,7 +93,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           builder: ${{ steps.buildx.outputs.name }}
-          context: fluidd
+          context: ./docker/fluidd
           file: ./docker/fluidd/Dockerfile
           platforms: linux/arm64
           push: true
