@@ -60,6 +60,6 @@ jobs:
             gucio1200/mainsail:latest
             gucio1200/mainsail:${{ steps.time.outputs.time }}
           build-args: |
-            FRONTEND_ZIP_URL=https://github.com/meteyou/mainsail/releases/latest/download/mainsail.zip
+            FRONTEND_ZIP_URL=https://github.com/mainsail-crew/mainsail/releases/latest/download/mainsail.zip
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
