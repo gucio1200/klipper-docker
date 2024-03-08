@@ -1,4 +1,4 @@
-FROM python:3.10 as builder
+FROM python:3.12 as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -17,7 +17,7 @@ RUN [ ! -d ${VENV_DIR} ] && python3 -m venv ${VENV_DIR}
 RUN ${VENV_DIR}/bin/python -m pip install pip -U
 RUN ${VENV_DIR}/bin/pip install -r moonraker/scripts/moonraker-requirements.txt
 
-FROM python:3.10-slim as run
+FROM python:3.12-slim as run
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG USER=klippy
