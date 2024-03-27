@@ -13,7 +13,10 @@ RUN groupadd -g ${GID} ${GROUP} && \
     usermod -a -G ${GROUP} ${USER} && \
     usermod -a -G tty ${USER} && \
     usermod -a -G dialout ${USER} && \
+    usermod -a -G sudo ${USER} && \
     chown -R ${USER}:${USER} ${WORKDIR}
+
+RUN echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" | tee "/etc/sudoers.d/klippy-sudo"
 
 USER ${USER}
 WORKDIR ${WORKDIR}
