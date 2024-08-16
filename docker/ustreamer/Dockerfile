@@ -10,7 +10,7 @@ RUN apt install -y libjpeg-turbo8-dev gpiod libgpiod-dev
 RUN git clone --depth=1 https://github.com/pikvm/ustreamer
 
 WORKDIR /build/ustreamer/
-RUN make WITH_GPIO=1
+RUN make
 
 FROM arm64v8/ubuntu as RUN
 
