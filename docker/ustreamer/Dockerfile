@@ -3,7 +3,7 @@ WORKDIR /build
 
 
 RUN apt-get update && \
-    apt-get install -y git libwebp-dev ca-certificates build-essential libevent-dev libjpeg62-dev uuid-dev libbsd-dev make gcc libjpeg8 libjpeg-turbo8 libuuid1 libbsd0
+    apt-get install -y git libwebp-dev ca-certificates build-essential libevent-dev libjpeg62-dev uuid-dev libbsd-dev make gcc libjpeg8 libjpeg-turbo8 libuuid1 libbsd0 pkg-config
 
 RUN apt install -y libjpeg-turbo8-dev gpiod libgpiod-dev
 
