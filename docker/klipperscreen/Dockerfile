@@ -9,8 +9,8 @@ ARG KLIPPER_VENV_DIR=${HOME}/klipperscreen-env
 
 RUN useradd -d ${HOME} -ms /bin/bash ${USER}
 RUN apt-get update && \
-    apt-get install -y locales git sudo wget gzip tar python3-distutils python3-gi \
-#    python3-gi-cairo 
+    apt-get install -y locales git sudo wget gzip tar python3-gi \
+#    python3-gi-cairo python3-distutils
     python3-virtualenv gir1.2-gtk-3.0 virtualenv matchbox-keyboard python3-dev \
     libjpeg-dev zlib1g-dev libatlas-base-dev gobject-introspection libgirepository1.0-dev \
     libcairo2-dev wireless-tools x11-xserver-utils xdotool libdbus-glib-1-dev \
