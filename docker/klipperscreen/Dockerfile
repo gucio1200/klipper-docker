@@ -14,7 +14,7 @@ RUN apt-get update && \
     python3-virtualenv gir1.2-gtk-3.0 virtualenv matchbox-keyboard python3-dev \
     libjpeg-dev zlib1g-dev libatlas-base-dev gobject-introspection libgirepository1.0-dev \
     libcairo2-dev wireless-tools x11-xserver-utils xdotool libdbus-glib-1-dev \
-    cmake fonts-nanum fonts-ipafont
+    cmake fonts-nanum fonts-ipafont libgirepository-2.0-dev
 
 RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
 RUN locale-gen
@@ -48,7 +48,7 @@ RUN useradd --user-group --no-log-init --shell /bin/false -m -d ${HOME} ${USER}
 RUN apt-get update && \
     apt-get install -y locales git sudo libatlas-base-dev python3-distutils python3-gi \
     python3-gi-cairo python3-virtualenv gir1.2-gtk-3.0 virtualenv matchbox-keyboard \
-    wireless-tools x11-xserver-utils xdotool curl fonts-nanum fonts-ipafont
+    wireless-tools x11-xserver-utils xdotool curl fonts-nanum fonts-ipafont libgirepository-2.0-dev
 
 RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
 RUN locale-gen
