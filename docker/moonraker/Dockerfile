@@ -1,4 +1,4 @@
-FROM python:3.10 as builder
+FROM python:3.14 as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -18,7 +18,7 @@ RUN ${VENV_DIR}/bin/python -m pip install pip -U
 RUN ${VENV_DIR}/bin/pip install lmdb==1.5.1
 RUN ${VENV_DIR}/bin/pip install -r moonraker/scripts/moonraker-requirements.txt
 
-FROM python:3.10-slim as run
+FROM python:3.14-slim as run
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG USER=klippy
