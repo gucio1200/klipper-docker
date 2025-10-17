@@ -15,12 +15,12 @@ RUN apt-get update && \
     libcairo2-dev wireless-tools x11-xserver-utils xdotool libdbus-glib-1-dev \
     cmake fonts-nanum fonts-ipafont
 
-RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
-RUN locale-gen
+#RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
+#RUN locale-gen
 
-ENV LC_ALL en_GB.UTF-8
-ENV LANG en_GB.UTF-8
-ENV LANGUAGE en_GB:en
+#ENV LC_ALL en_GB.UTF-8
+#ENV LANG en_GB.UTF-8
+#ENV LANGUAGE en_GB:en
 
 USER ${USER}
 WORKDIR ${HOME}
@@ -59,12 +59,12 @@ RUN apt update \
       libdbus-glib-1-2 \
  && apt clean
 
-RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
-RUN locale-gen
+#RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
+#RUN locale-gen
 
-ENV LC_ALL en_GB.UTF-8
-ENV LANG en_GB.UTF-8
-ENV LANGUAGE en_GB:en
+#ENV LC_ALL en_GB.UTF-8
+#ENV LANG en_GB.UTF-8
+#ENV LANGUAGE en_GB:en
 
 COPY --chown=${USER}:${USER} --from=builder ${HOME}/klipperscreen ${HOME}/klipperscreen
 COPY --chown=${USER}:${USER} --from=builder ${KLIPPER_VENV_DIR} ${KLIPPER_VENV_DIR}
