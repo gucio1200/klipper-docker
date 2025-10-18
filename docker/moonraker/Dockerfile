@@ -46,7 +46,7 @@ RUN apt update && \
       git \
       jq \
     # Clean up
-    apt-get autoremove -y && \
+    && apt-get autoremove -y && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*   
 
