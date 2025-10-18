@@ -15,7 +15,7 @@ WORKDIR ${WORKDIR}
 RUN git clone https://github.com/Arksine/moonraker.git
 RUN [ ! -d ${VENV_DIR} ] && python3 -m venv ${VENV_DIR}
 RUN ${VENV_DIR}/bin/python -m pip install pip -U
-RUN ${VENV_DIR}/bin/pip install lmdb==1.7.5 dbus-next==0.2.3
+RUN ${VENV_DIR}/bin/pip install lmdb==1.7.5
 RUN ${VENV_DIR}/bin/pip install -r moonraker/scripts/moonraker-requirements.txt
 
 FROM python:3.10-slim as run
