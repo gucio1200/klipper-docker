@@ -15,7 +15,7 @@ WORKDIR ${WORKDIR}
 RUN git clone https://github.com/Arksine/moonraker.git
 RUN [ ! -d ${VENV_DIR} ] && python3 -m venv ${VENV_DIR}
 RUN ${VENV_DIR}/bin/python -m pip install pip -U
-RUN ${VENV_DIR}/bin/pip install lmdb==1.5.1
+RUN ${VENV_DIR}/bin/pip install lmdb==1.7.5
 RUN ${VENV_DIR}/bin/pip install -r moonraker/scripts/moonraker-requirements.txt
 
 FROM python:3.10-slim as run
@@ -29,21 +29,22 @@ ARG VENV_DIR=${WORKDIR}/venv
 
 RUN apt update && \
     apt install -y \
-    git \
-    libjpeg62-turbo \
-    libtiff6 \
-    libxcb1 \
-    zlib1g \
-    libssl3 \
-    libcurl4 \
-    curl \
-    libsodium23 \
-    liblmdb0 \
-    iproute2 \
-    libopenjp2-7 \
-    sudo \
-    systemd \
-    python3-libgpiod && \
+      libopenjp2-7 \
+      python3-libgpiod \
+      curl \
+      libcurl4t64 \
+      libssl3t64 \
+      liblmdb0 \
+      libsodium23 \
+      libjpeg62-turbo \
+      libtiff6 \
+      libxcb1 \
+      zlib1g \
+      iproute2 \
+      systemd \
+      sudo \
+      git \
+      jq \
     # Clean up
     apt-get autoremove -y && \
     apt-get clean -y && \
