@@ -38,6 +38,7 @@ RUN useradd --user-group --no-log-init --shell /bin/false -m -d ${HOME} ${USER}
 
 RUN apt update \
  && apt install -y \
+      curl \
       git \
       xdotool \
       x11-xserver-utils \
