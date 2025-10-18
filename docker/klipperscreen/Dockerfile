@@ -27,9 +27,9 @@ WORKDIR ${HOME}
 
 ### KlipperScreen setup ###
 RUN git clone https://github.com/jordanruthe/KlipperScreen.git klipperscreen
-RUN [ ! -d ${KLIPPER_VENV_DIR} ] && virtualenv -p /usr/bin/python3 ${KLIPPER_VENV_DIR}
-RUN ${KLIPPER_VENV_DIR}/bin/python -m pip install pip -U
-RUN ${KLIPPER_VENV_DIR}/bin/pip install setuptools wheel pep517 p5py PyGObject==3.50.0
+RUN python -m venv ${KLIPPER_VENV_DIR}
+#RUN ${KLIPPER_VENV_DIR}/bin/python -m pip install pip -U
+#RUN ${KLIPPER_VENV_DIR}/bin/pip install setuptools wheel pep517 p5py PyGObject==3.50.0
 RUN ${KLIPPER_VENV_DIR}/bin/pip install -r klipperscreen/scripts/KlipperScreen-requirements.txt
 
 WORKDIR ${HOME}
@@ -58,13 +58,6 @@ RUN apt update \
       libatlas3-base \
       libdbus-glib-1-2 \
  && apt clean
-
-#RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
-#RUN locale-gen
-
-#ENV LC_ALL en_GB.UTF-8
-#ENV LANG en_GB.UTF-8
-#ENV LANGUAGE en_GB:en
 
 COPY --chown=${USER}:${USER} --from=builder ${HOME}/klipperscreen ${HOME}/klipperscreen
 COPY --chown=${USER}:${USER} --from=builder ${KLIPPER_VENV_DIR} ${KLIPPER_VENV_DIR}
