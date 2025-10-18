@@ -8,19 +8,13 @@ ARG KLIPPER_VENV_DIR=${HOME}/klipperscreen-env
 
 
 RUN useradd -d ${HOME} -ms /bin/bash ${USER}
-RUN apt-get update && \
-    apt-get install -y locales git sudo wget gzip tar python3-gi \
-    python3-virtualenv gir1.2-gtk-3.0 virtualenv matchbox-keyboard python3-dev \
-    libjpeg-dev zlib1g-dev gobject-introspection libgirepository1.0-dev \
-    libcairo2-dev wireless-tools x11-xserver-utils xdotool libdbus-glib-1-dev \
-    cmake fonts-nanum fonts-ipafont
-
-#RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
-#RUN locale-gen
-
-#ENV LC_ALL en_GB.UTF-8
-#ENV LANG en_GB.UTF-8
-#ENV LANGUAGE en_GB:en
+RUN apt update \
+ && apt install -y \
+      libgirepository1.0-dev \
+      libdbus-glib-1-dev \
+      cmake \
+      libsystemd-dev \
+ && apt clean
 
 USER ${USER}
 WORKDIR ${HOME}
@@ -28,8 +22,6 @@ WORKDIR ${HOME}
 ### KlipperScreen setup ###
 RUN git clone https://github.com/jordanruthe/KlipperScreen.git klipperscreen
 RUN python -m venv ${KLIPPER_VENV_DIR}
-#RUN ${KLIPPER_VENV_DIR}/bin/python -m pip install pip -U
-#RUN ${KLIPPER_VENV_DIR}/bin/pip install setuptools wheel pep517 p5py PyGObject==3.50.0
 RUN ${KLIPPER_VENV_DIR}/bin/pip install -r klipperscreen/scripts/KlipperScreen-requirements.txt
 
 WORKDIR ${HOME}
