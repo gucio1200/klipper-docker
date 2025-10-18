@@ -6,15 +6,20 @@ services:
     image: gucio1200/klipper:latest
     cpus: 4
     container_name: klipper
+    privileged: true
     restart: unless-stopped
+    depends_on:
+      - mcu
     volumes:
+      - type: bind
+        source: /dev
+        target: /dev
       - klipper:/home/klippy/klipper
       - ./runtime/config:/home/klippy/printer_data/config
       - ./runtime/gcodes:/home/klippy/printer_data/gcodes
       - logs:/home/klippy/printer_data/logs
       - run:/home/klippy/printer_data/run
       - tmp:/tmp
-      - /dev:/dev
       - ./runtime/scripts:/scripts
       - ./runtime/scripts/gcode_shell_command.py:/home/klippy/klipper/klippy/extras/gcode_shell_command.py
     devices:
@@ -45,6 +50,7 @@ services:
     cpus: 2
     container_name: moonraker
     privileged: true
+    pid: host
     ports:
       - 7125:7125
     restart: unless-stopped
@@ -57,6 +63,8 @@ services:
       timeout: 5s
       retries: 5
     volumes:
+      - /run/dbus:/run/dbus
+      - /run/systemd:/run/systemd
       - klipper:/home/klippy/klipper
       - moonraker:/home/klippy/moonraker
       - klipperscreen:/home/klippy/klipperscreen
@@ -74,8 +82,9 @@ services:
   klipperscreen:
     image: gucio1200/klipperscreen:latest
     cpus: 2
+    pid: host
     environment:
-     - DISPLAY=unix:0.0
+     - DISPLAY=:0
     user: klippy
     container_name: klipperscreen
     restart: unless-stopped
@@ -90,9 +99,12 @@ services:
       timeout: 5s
       retries: 5
     volumes:
+      - /run/dbus:/run/dbus
+      - /run/systemd:/run/systemd
+      - /etc/localtime:/etc/localtime:ro
       - /tmp/.X11-unix:/tmp/.X11-unix
       - klipperscreen:/home/klippy/klipperscreen
-      - ./runtime/config/KlipperScreen.conf:/home/klippy/KlipperScreen.conf
+      - ./runtime/config/KlipperScreen.conf:/home/klippy/.config/KlipperScreen/KlipperScreen.conf
     labels:
       - com.centurylinklabs.watchtower.enable=true
 
@@ -124,11 +136,11 @@ services:
       context: .
     container_name: ustreamer
     restart: unless-stopped
-    command: ./ustreamer --host=0.0.0.0 --slowdown --format=mjpeg -r 1280x960 --buffers=3 --drop-same-frames=30 -q 100
+    command: ./ustreamer --host=0.0.0.0 --slowdown --format=mjpeg -r 1280x960 --buffers=3 --drop-same-frames=30 -q 100 --device=/dev/video1
     ports:
       - 8080:8080
     devices:
-      - /dev/video0:/dev/video0
+      - /dev/video1:/dev/video1
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.cam.rule=Host(`cam.vcore`)"

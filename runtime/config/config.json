@@ -1,6 +1,6 @@
 {
     "defaultLocale": "en",
-    "hostname": "vcore",
+    "hostname": "printer.vcore",
     "port": 7125,
     "instancesDB": "moonraker",
     "instances": []
