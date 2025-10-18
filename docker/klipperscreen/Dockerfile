@@ -50,6 +50,9 @@ RUN apt update \
       libcairo2 \
       libatlas3-base \
       libdbus-glib-1-2 \
+      fonts-nanum \
+      fonts-ipafont \
+      libmpv-dev \
  && apt clean
 
 COPY --chown=${USER}:${USER} --from=builder ${HOME}/klipperscreen ${HOME}/klipperscreen
