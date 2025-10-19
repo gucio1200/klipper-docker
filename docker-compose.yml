@@ -83,6 +83,7 @@ services:
     image: gucio1200/klipperscreen:latest
     cpus: 2
     pid: host
+    privileged: true
     environment:
      - DISPLAY=:0
     user: klippy
@@ -98,7 +99,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    group_add:
+      - 44
+      - 105
     volumes:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/dri/card0:/dev/dri/card0
       - /run/dbus:/run/dbus
       - /run/systemd:/run/systemd
       - /etc/localtime:/etc/localtime:ro
@@ -135,6 +141,7 @@ services:
       dockerfile: ./ustreamer/Dockerfile
       context: .
     container_name: ustreamer
+    privileged: true
     restart: unless-stopped
     command: ./ustreamer --host=0.0.0.0 --slowdown --format=mjpeg -r 1280x960 --buffers=3 --drop-same-frames=30 -q 100 --device=/dev/video1
     ports:
